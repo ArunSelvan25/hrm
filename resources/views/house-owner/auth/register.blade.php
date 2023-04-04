@@ -1,6 +1,8 @@
 
-@extends('admin.app')
-
+@extends('house-owner.app')
+@section('title')
+    Registration | HouseOwner
+@endsection('title')
 @section('content')
     <div class="container pt-5 mt-5">
         <div class="card mx-auto col-3">
@@ -28,9 +30,26 @@
                     </div>
                 </div>
                 <div class="card-footer text-center text-muted">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button id="submit" type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </form>
         </div>
     </div>
 @endsection('content')
+
+@section('script')
+<script>
+    $(document).ready(function(){
+        // let ip_address = '127.0.0.1';
+        // let socket_port = '3000';
+        // let socket = io(ip_address+ ':' +socket_port);
+        // $('#submit').on('click', function(){
+        //         socket.emit('houseOwnerCreated');
+        // });
+    })
+
+
+
+
+</script>
+@endsection('script')

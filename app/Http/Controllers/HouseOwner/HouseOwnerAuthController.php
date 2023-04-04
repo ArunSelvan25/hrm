@@ -5,7 +5,7 @@ namespace App\Http\Controllers\HouseOwner;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HouseOwnerRegisterRequest;
 use App\Models\{HouseOwner, Admin};
-use Illuminate\Support\Facades\{Hash, Crypt};
+use Illuminate\Support\Facades\{Hash, Crypt, Http};
 use App\Notifications\HouseOwnerCreatedNotification;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,6 +34,7 @@ class HouseOwnerAuthController extends Controller
         ]);
         $admin = Admin::first();
         $admin->notify(new HouseOwnerCreatedNotification($houseOwner));
+        Http::get('127.0.0.1:3000/house-owner-created');
         return back()->with('success','User created successfully');
     }
 

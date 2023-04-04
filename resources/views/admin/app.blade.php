@@ -28,6 +28,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
 
+{{-- Socket --}}
+<script src="https://cdn.socket.io/4.5.3/socket.io.min.js"
+        integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi"
+        crossorigin="anonymous"></script>
+
 <script>
 
     @if(Session::has('errors'))
@@ -52,6 +57,23 @@
             }
         });
     }
+
+    $(document).ready(function(){
+        let ip_address = '127.0.0.1';
+        let socket_port = '3000';
+        let socket = io(ip_address+ ':' +socket_port);
+        socket.on('houseOwnerCreatedNotification', (message) => {
+            var oldValue = {{ getNotificationsCount() }};
+            var newValue = 1;
+            console.log('getNotificationsCount', {{ getNotificationsCount() }});
+            console.log('oldValue + newValue',oldValue + newValue)
+            $('#notification_count').text( oldValue + newValue);
+        });
+    })
+
+
+
+
 
 </script>
 </html>
