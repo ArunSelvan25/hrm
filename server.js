@@ -13,9 +13,10 @@ io.on('connection', (socket) => {
 
 app.get('/house-owner-created',async function(req,res,next){
     io.sockets.emit('houseOwnerCreatedNotification');
+    console.log('emitted registered event');
     res.send('Event Triggered');
 });
 
-server.listen(3000, () => {
+server.listen(3002, () => {
     console.log('Listening successful');
 });
