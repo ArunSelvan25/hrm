@@ -5,7 +5,7 @@
     <div>
         <form method="post" action="{{ route('admin.create-role') }}">
             @csrf
-            @if(Auth::guard('admin')->user()->can('role-list'))
+            @if(Auth::guard('admin')->user()->hasPermissionTo('role-list', 'admin'))
                 <div class="form-floating mb-3">
                     <label for="role text-dark">New Role</label>
                     <input name="role" type="text" class="form-control" id="role">
@@ -17,9 +17,9 @@
                     <label class="form-check-label text-dark" for="inlineCheckbox{{$permission->id}}">{{ $permission->name }}</label>
                 </div>
             @endforeach
-            @if(Auth::guard('admin')->user()->can('role-list'))
+            @role('Admin', 'admin')
                 <button class="btn btn-primary" type="submit">Add role</button>
-            @endif
+            @endrole
 
         </form>
 
