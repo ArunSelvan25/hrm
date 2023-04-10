@@ -17,6 +17,6 @@ app.get('/house-owner-created',async function(req,res,next){
     res.send('Event Triggered');
 });
 
-server.listen(3002, () => {
+server.listen(3000, () => {
     console.log('Listening successful');
 });

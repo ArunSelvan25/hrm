@@ -34,8 +34,8 @@ class HouseOwnerAuthController extends Controller
         ]);
         $admin = Admin::first();
         $admin->notify(new HouseOwnerCreatedNotification($houseOwner));
-        Http::get('127.0.0.1:3002/house-owner-created');
-        return back()->with('success','User created successfully');
+        Http::get('127.0.0.1:3000/house-owner-created');
+        return back()->with('success','House owner created successfully');
     }
 
 
