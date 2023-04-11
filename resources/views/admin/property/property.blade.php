@@ -43,7 +43,10 @@
 @section('script')
     <script>
         $(document).ready(function() {
-            propertyrList()
+            propertyrList();
+            $('.house-owner').select2({
+                dropdownParent: $('#houseOwnerModal')
+            });
         });
 
 

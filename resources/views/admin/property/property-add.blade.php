@@ -31,7 +31,15 @@
                         <label for="description" class="form-label">Description</label>
                         <input type="text" name="description" class="form-control" id="description" placeholder="Description">
                     </div>
-                    Need to add house owner select2
+                    <div class="mb-3" >
+                        <label for="description" class="form-label">Select House Owner</label>
+                        <select class="house-owner form-label" style="width:100%" name="house_owner" placeholder="Select house owner">
+                            <option selected="true" disabled>Select House Owner</option>
+                            @foreach(getHouseOwnerList() as $houserOwnerList)
+                                <option value="{{$houserOwnerList->id}}">{{$houserOwnerList->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
