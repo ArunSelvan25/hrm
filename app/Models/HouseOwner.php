@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\Property;
 
 class HouseOwner extends Authenticatable
 {
@@ -21,4 +22,9 @@ class HouseOwner extends Authenticatable
         'password',
         'original_password'
     ];
+
+    public function properties()
+    {
+        return $this->hasMany(Property::class);
+    }
 }

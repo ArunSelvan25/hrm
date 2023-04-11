@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FileManagementController;
-use App\Http\Controllers\Admin\{Auth\AdminAuthController, RolesAndPermissionController, AdminHouseOwnerManagement};
+use App\Http\Controllers\Admin\{Auth\AdminAuthController, RolesAndPermissionController, AdminHouseOwnerManagement,
+    AdminPropertyManagementController};
 use App\Http\Controllers\HouseOwner\HouseOwnerAuthController;
 
 /*
@@ -44,6 +45,13 @@ Route::prefix('admin')->middleware('adminAuth')->name('admin.')->group(function 
         Route::get('/house-owner/list', 'houseOwnerList')->name('house-owner.list');
         Route::post('/house-owner/edit', 'editHouseOwner')->name('house-owner.edit');
         Route::post('/house-owner/delete', 'deleteHouseOwner')->name('house-owner.delete');
+    });
+    Route::controller(AdminPropertyManagementController::class)->group(function () {
+        Route::get('/property', 'getProperty')->name('property');
+        Route::get('/property/list', 'propertyList')->name('property.list');
+        Route::post('/property/add', 'addProperty')->name('property.add');
+        Route::post('/property/edit', 'editProperty')->name('property.edit');
+        Route::post('/property/delete', 'deleteProperty')->name('property.delete');
     });
 });
 

@@ -44,6 +44,42 @@
     </li>
 
     <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('admin.property') }}"
+           aria-expanded="true" aria-controls="collapseTwo">
+           <i class="fas fa-solid fa-home"></i>
+            <span>Property Management</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#"
+           aria-expanded="true" aria-controls="collapseTwo">
+           <i class="fas fa-solid fa-user-tie"></i>
+            <span>Tenant Management</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#"
+           aria-expanded="true" aria-controls="collapseTwo">
+           <i class="fas fa-duotone fa-users"></i>
+            <span>User Management</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 
     <!-- Sidebar Toggler (Sidebar) -->

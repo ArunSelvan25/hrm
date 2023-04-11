@@ -15,9 +15,12 @@ return new class extends Migration
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->tinyInteger('status');
+            $table->unsignedBigInteger('house_owner_id');
+            $table->foreign('house_owner_id')->references('id')->on('house_owners')->onDelete('cascade');
+            $table->string('title');
+            $table->string('description')->nullable();
+            $table->string('image')->nullable();
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
     }

@@ -4,21 +4,33 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\HouseOwner;
-use App\Http\Requests\HouseOwnerEditRequest;
+use App\Models\Property;
 
-class AdminHouseOwnerManagement extends Controller
+class AdminPropertyManagementController extends Controller
 {
-    public function __construct(HouseOwner $houseOwner)
+    public function __construct(Property $property)
     {
-        $this->houseOwner = $houseOwner;
-    }
-    public function getHouseOwner(){
-        return view('admin.house-owner.house-owner');
+        $this->property = $property;
     }
 
-    public function houseOwnerList(Request $request){
-        $query = $this->houseOwner;
+    public function addProperty(Request $request)
+    {
+        $this->property->create([
+            'house_owner_id' => $request->house_owner_id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => 1,
+        ]);
+        return redirect()->route('admin.property')->with('success','Property Created successfully');
+    }
+
+    public function getProperty()
+    {
+        return view('admin.property.property');
+    }
+
+    public function propertyList(Request $request){
+        $query = $this->property;
         $limit = $request->iDisplayLength;
         $offset = $request->iDisplayStart;
 
@@ -27,7 +39,7 @@ class AdminHouseOwnerManagement extends Controller
             $query = $query->when(
                 $keyword!='',
                 function ($q) use ($keyword) {
-                    return $q->where('name', 'like', '%'.$keyword.'%');
+                    return $q->where('title', 'like', '%'.$keyword.'%');
                 }
             );
         }
@@ -39,33 +51,33 @@ class AdminHouseOwnerManagement extends Controller
                 return $q->offset($offset)->limit($limit);
             }
         );
-        $data = $query->latest()->get();
+        $data = $query->latest()->with('houseOwner')->get();
         $column = array();
         foreach ($data as $value) {
             $action = '<button class="btn btn-outline-success" href="#" data-toggle="modal"
-                                data-target="#propertyAddModal-'.$value->id.'">
-                            <i class="fas fa-solid fa-home"></i>
-                            Add Property
+                                data-target="#tenantAddModal-'.$value->id.'">
+                            <i class="fas fa-solid fa-user-tie"></i>
+                            Add Tenant
                             </button>
                              <button class="btn btn-outline-primary" href="#" data-toggle="modal"
-                                data-target="#houseOwnerEditModal-'.$value->id.'">
-                                <i class="fas fa-solid fa-user-edit"></i>
+                                data-target="#propertyEditModal-'.$value->id.'">
+                                <i class="fas fa-solid fa-pen"></i>
                                 Edit
                              </button>
                               <button class="btn btn-outline-warning" href="#" data-toggle="modal"
-                                data-target="#houseOwnerDeleteModal-'.$value->id.'">
+                                data-target="#propertyDeleteModal-'.$value->id.'">
                                 <i class="fas fa-solid fa-trash"></i>
                                 Delete
                              </button>
 
 
-                             <div class="modal fade" id="propertyAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyAdd-'.$value->id.'"
+                             <div class="modal fade" id="tenantAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="tenantAdd-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.property.add').'">
+                                    <form class="container" method="post" action="#">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="propertyAdd-'.$value->id.'">Add property for <strong>'.$value->name.'</strong></h5>
+                                                <h5 class="modal-title" id="tenantAdd-'.$value->id.'">Add tenant for <strong>'.$value->title.'</strong></h5>
                                                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
@@ -93,27 +105,27 @@ class AdminHouseOwnerManagement extends Controller
 
 
 
-                             <div class="modal fade" id="houseOwnerEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerEdit-'.$value->id.'"
+                             <div class="modal fade" id="propertyEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyEdit-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.house-owner.edit').'">
+                                    <form class="container" method="post" action="'.route('admin.property.edit').'">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="houseOwnerEdit-'.$value->id.'">Edit house owner</h5>
+                                                <h5 class="modal-title" id="propertyEdit-'.$value->id.'">Edit house owner</h5>
                                                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
                                             </div>
                                             <div class="modal-body">
                                                 <input type="hidden" name="_token" value="'.csrf_token().'" readonly>
-                                                <input type="hidden" name="owner_id" value="'.$value->id.'" readonly>
+                                                <input type="hidden" name="property_id" value="'.$value->id.'" readonly>
                                                 <div class="mb-3">
-                                                    <label for="name" class="form-label">Name</label>
-                                                    <input type="text" value="'.$value->name.'" name="name" class="form-control" id="name" placeholder="Name">
+                                                    <label for="title" class="form-label">Title</label>
+                                                    <input type="text" value="'.$value->title.'" name="title" class="form-control" id="title" placeholder="Title">
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label for="email" class="form-label">Email address</label>
-                                                    <input type="email" value="'.$value->email.'" name="email" class="form-control" id="email" placeholder="name@example.com">
+                                                    <label for="description" class="form-label">Description</label>
+                                                    <textarea type="text" name="description" class="form-control" id="description">'.$value->description.'</textarea>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -126,21 +138,21 @@ class AdminHouseOwnerManagement extends Controller
                             </div>
 
 
-                            <div class="modal fade" id="houseOwnerDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerDelete-'.$value->id.'"
+                            <div class="modal fade" id="propertyDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyDelete-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.house-owner.delete').'">
+                                    <form class="container" method="post" action="'.route('admin.property.delete').'">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="houseOwnerDelete-'.$value->id.'">Delete House Owner</h5>
+                                                <h5 class="modal-title" id="propertyDelete-'.$value->id.'">Delete Property</h5>
                                                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
                                             </div>
                                             <div class="modal-body">
                                                 <input type="hidden" name="_token" value="'.csrf_token().'" readonly>
-                                                <input type="hidden" name="owner_id" value="'.$value->id.'" readonly>
-                                                <p>Are you sure you want to delete <strong>Owner - '.$value->name.'?</strong></p>
+                                                <input type="hidden" name="property_id" value="'.$value->id.'" readonly>
+                                                <p>Are you sure you want to delete <strong>Property - '.$value->title.'?</strong></p>
                                             </div>
                                             <div class="modal-footer">
                                                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
@@ -151,8 +163,9 @@ class AdminHouseOwnerManagement extends Controller
                                 </div>
                             </div>';
             $col['id'] = $offset+1;
-            $col['name'] = $value->name ?? '-';
-            $col['email'] =$value->email ?? '-';
+            $col['title'] = $value->title ?? '-';
+            $col['house_owner'] = $value->houseOwner->name ?? '-';
+            $col['description'] =$value->description ?? '-';
             $col['action']=$action ?? '-';
 
             array_push($column, $col);
@@ -166,20 +179,20 @@ class AdminHouseOwnerManagement extends Controller
         return json_encode($data);
     }
 
-    public function editHouseOwner(HouseOwnerEditRequest $request)
+    public function editProperty(Request $request)
     {
-        $houseOwnerData = $this->houseOwner->findorFail($request->owner_id);
-        $houseOwnerData->update([
-            'name' => $request['name'],
-            'email' => $request['email']
+        $propertyData = $this->property->findorFail($request->property_id);
+        $propertyData->update([
+            'title' => $request->title,
+            'description' => $request->description
         ]);
-        return back()->with('success','Owner Edited successfully');
+        return back()->with('success','Property Edited successfully');
     }
 
-    public function deleteHouseOwner(Request $request)
+    public function deleteProperty(Request $request)
     {
-        $houseOwnerData = $this->houseOwner->findorFail($request->owner_id);
-        $houseOwnerData->delete();
-        return back()->with('success','Owner Deleted successfully');
+        $propertyData = $this->property->findorFail($request->property_id);
+        $propertyData->delete();
+        return back()->with('success','Property Deleted successfully');
     }
 }
