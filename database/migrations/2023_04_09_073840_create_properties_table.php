@@ -20,6 +20,10 @@ return new class extends Migration
             $table->string('title');
             $table->string('description')->nullable();
             $table->string('image')->nullable();
+            $table->integer('max_person')->default(0);
+            $table->integer('advance')->default(0);
+            $table->integer('rent')->default(0);
+            $table->tinyInteger('type')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });

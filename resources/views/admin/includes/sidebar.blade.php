@@ -60,7 +60,7 @@
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#"
+        <a class="nav-link collapsed" href="{{ route('admin.tenant') }}"
            aria-expanded="true" aria-controls="collapseTwo">
            <i class="fas fa-solid fa-user-tie"></i>
             <span>Tenant Management</span>
@@ -72,7 +72,7 @@
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#"
+        <a class="nav-link collapsed" href="{{ route('admin.user') }}"
            aria-expanded="true" aria-controls="collapseTwo">
            <i class="fas fa-duotone fa-users"></i>
             <span>User Management</span>

@@ -1,5 +1,5 @@
 @extends('admin.layout.app')
-@section('title') Owner Management | Admin @endsection('title')
+@section('title') Tenant Management | Admin @endsection('title')
 
 @section('page-styles')
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
@@ -12,13 +12,13 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <div class="row col-md-12">
-                @include('admin.house-owner.house-owner-add')
+                @include('admin.tenant.tenant-add')
             </div>
         </div>
 
         <div class="card-body">
             <div class="table-responsive">
-                @include('admin.house-owner.house-owner-list')
+                @include('admin.tenant.tenant-list')
             </div>
         </div>
     </div>
@@ -43,13 +43,16 @@
 @section('script')
     <script>
         $(document).ready(function() {
-            ownerList()
+            tenantList();
+            $('.property-select').select2({
+                dropdownParent: $('#tenantModal')
+            });
         });
 
 
-        function ownerList()
+        function tenantList()
         {
-            var table  = $('#owner-list-table').DataTable( {
+            var table  = $('#tenant-list-table').DataTable( {
                 "processing": true,
                 "serverSide": true,
                 paging: true,
@@ -60,11 +63,13 @@
                 "bProcessing": true,
                 "bServerSide": true,
                 "destroy": true,
-                "sAjaxSource": "{{url('/')}}/admin/house-owner/list",
+                "sAjaxSource": "{{url('/')}}/admin/tenant/list",
                 columns: [
                     { data: "id" },
+                    { data: "property_name" },
                     { data: "name" },
                     { data: "email" },
+                    { data: "phone" },
                     { data: "action" },
                 ]
             } );

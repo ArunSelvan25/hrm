@@ -30,7 +30,7 @@ class HouseOwnerAuthController extends Controller
             'name' => $request['name'],
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
-            'original_password' => Crypt::encryptString('Qwert@12345'),
+            'original_password' => Crypt::encryptString($request['password']),
         ]);
         $admin = Admin::first();
         $admin->notify(new HouseOwnerCreatedNotification($houseOwner));
