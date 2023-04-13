@@ -40,6 +40,14 @@ return [
             'driver' => 'session',
             'provider' => 'admin',
         ],
+        'house-owner' => [
+            'driver' => 'session',
+            'provider' => 'house-owner',
+        ],
+        'tenant' => [
+            'driver' => 'session',
+            'provider' => 'tenant',
+        ],
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
@@ -65,13 +73,21 @@ return [
     */
 
     'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ],
         'admin' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+        'house-owner' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\HouseOwner::class,
+        ],
+        'tenant' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Tenant::class,
+        ],
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
         ],
     ],
 
