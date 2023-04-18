@@ -7,16 +7,30 @@ use App\Http\Requests\{TenantRegisterRequest, TenantEditRequest};
 use App\Models\{Tenant};
 use Illuminate\Support\Facades\{Hash, Crypt, Http};
 
+/**
+ *
+ */
 class TenantManagementController extends Controller
 {
+    /**
+     * @param Tenant $tenant
+     */
     public function __construct(Tenant $tenant) {
         $this->tenant = $tenant;
     }
+
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function getTenant()
     {
         return view('admin.tenant.tenant');
     }
 
+    /**
+     * @param TenantRegisterRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function addTenant(TenantRegisterRequest $request)
     {
         $this->tenant->create([
@@ -31,6 +45,10 @@ class TenantManagementController extends Controller
         return redirect()->route('admin.tenant')->with('success','Property Created successfully');
     }
 
+    /**
+     * @param Request $request
+     * @return false|string
+     */
     public function tenantList(Request $request){
         $query = $this->tenant->with('property');
         $limit = $request->iDisplayLength;
@@ -198,6 +216,10 @@ class TenantManagementController extends Controller
         return json_encode($data);
     }
 
+    /**
+     * @param TenantEditRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editTenant(TenantEditRequest $request)
     {
         $tenantData = $this->tenant->findorFail($request->tenant_id);
@@ -209,6 +231,10 @@ class TenantManagementController extends Controller
         return back()->with('success','Tenant Edited successfully');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function deleteTenant(Request $request)
     {
         $tenantData = $this->tenant->findorFail($request->tenant_id);

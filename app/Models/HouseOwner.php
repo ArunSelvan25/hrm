@@ -6,10 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\Property;
+use Spatie\Permission\Traits\HasRoles;
 
 class HouseOwner extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, HasRoles;
+
+    protected $guard_name = "house-owner";
+    protected $guard = 'house-owner';
 
     /**
      * The attributes that are mass assignable.

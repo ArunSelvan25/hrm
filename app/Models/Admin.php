@@ -26,4 +26,5 @@ class Admin extends Authenticatable
         'password',
         'original_password'
     ];
+
 }

@@ -5,18 +5,30 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\HouseOwner;
+use Spatie\Permission\Models\{Role, Permission};
 use App\Http\Requests\HouseOwnerEditRequest;
 
 class AdminHouseOwnerManagement extends Controller
 {
+    /**
+     * @param HouseOwner $houseOwner
+     */
     public function __construct(HouseOwner $houseOwner)
     {
         $this->houseOwner = $houseOwner;
     }
+
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function getHouseOwner(){
         return view('admin.house-owner.house-owner');
     }
 
+    /**
+     * @param Request $request
+     * @return false|string
+     */
     public function houseOwnerList(Request $request){
         $query = $this->houseOwner;
         $limit = $request->iDisplayLength;
@@ -166,6 +178,10 @@ class AdminHouseOwnerManagement extends Controller
         return json_encode($data);
     }
 
+    /**
+     * @param HouseOwnerEditRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editHouseOwner(HouseOwnerEditRequest $request)
     {
         $houseOwnerData = $this->houseOwner->findorFail($request->owner_id);
@@ -176,6 +192,10 @@ class AdminHouseOwnerManagement extends Controller
         return back()->with('success','Owner Edited successfully');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function deleteHouseOwner(Request $request)
     {
         $houseOwnerData = $this->houseOwner->findorFail($request->owner_id);

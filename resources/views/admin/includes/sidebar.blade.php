@@ -18,30 +18,37 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
+{{--    @dd(Auth::guard('admin')->user()->can('role-list'))--}}
+{{--    @dd(can('role-list'))--}}
+    @if((Auth::guard('admin')->user() && Auth::guard('admin')->user()->hasPermissionTo('role-list','admin')) ||
+        (Auth::guard('house-owner')->user() && Auth::guard('house-owner')->user()->hasPermissionTo('role-list','house-owner'))
+        )
+{{--    @can('role-list')--}}
+        <!-- Divider -->
+        <hr class="sidebar-divider">
 
-{{--    <!-- Divider -->--}}
-{{--    <hr class="sidebar-divider">--}}
+        <!-- Nav Item - Pages Collapse Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="{{ route('admin.role-permission') }}"
+                aria-expanded="true" aria-controls="collapseTwo">
+                <i class="fas fa-fw fa-cog"></i>
+                <span>Access Management</span>
+            </a>
+        </li>
 
-{{--    <!-- Nav Item - Pages Collapse Menu -->--}}
-{{--    <li class="nav-item">--}}
-{{--        <a class="nav-link collapsed" href="{{ route('admin.role-permission') }}"--}}
-{{--            aria-expanded="true" aria-controls="collapseTwo">--}}
-{{--            <i class="fas fa-fw fa-cog"></i>--}}
-{{--            <span>Access Management</span>--}}
-{{--        </a>--}}
-{{--    </li>--}}
+        <!-- Divider -->
+        <hr class="sidebar-divider">
 
-    <!-- Divider -->
-    <hr class="sidebar-divider">
-
-    <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item">
-        <a class="nav-link collapsed {{ (request()->is('*admin/house-owner*')) ? 'bg-primary text-white' : '' }}" href="{{ route('admin.house-owner') }}"
-           aria-expanded="true" aria-controls="collapseTwo">
-            <i class="fas fa-fw fa-cog"></i>
-            <span>Owner Management</span>
-        </a>
-    </li>
+        <!-- Nav Item - Pages Collapse Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed {{ (request()->is('*admin/house-owner*')) ? 'bg-primary text-white' : '' }}" href="{{ route('admin.house-owner') }}"
+               aria-expanded="true" aria-controls="collapseTwo">
+                <i class="fas fa-fw fa-cog"></i>
+                <span>Owner Management</span>
+            </a>
+        </li>
+{{--    @endcan--}}
+    @endif
 
     <!-- Divider -->
     <hr class="sidebar-divider">

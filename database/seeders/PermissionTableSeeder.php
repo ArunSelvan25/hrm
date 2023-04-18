@@ -16,6 +16,20 @@ class PermissionTableSeeder extends Seeder
      */
     public function run()
     {
+        $guards = [
+            'admin',
+            'house-owner',
+            'tenant',
+            'web'
+        ];
+
+        $roles = [
+            'admin',
+            'house-owner',
+            'tenant',
+            'web'
+        ];
+
         $permissions = [
             'role-list',
             'role-create',
@@ -23,11 +37,17 @@ class PermissionTableSeeder extends Seeder
             'role-delete',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission, 'guard_name' => 'admin']);
+        foreach($guards as $guard) {
+            foreach ($permissions as $permission) {
+                Permission::create(['name' => $permission, 'guard_name' => $guard]);
+            }
         }
-        $role = Role::create(['name' => 'Admin', 'guard_name' => 'admin']);
-        $permissions = Permission::all();
+
+        foreach($roles as $role){
+            Role::create(['name' => $role, 'guard_name' => $role]);
+        }
+        $role = Role::where('name','admin')->first();
+        $permissions = Permission::where('guard_name','admin')->get();
         $role->syncPermissions($permissions);
         $admin = Admin::find(1);
         $admin->assignRole([$role->id]);

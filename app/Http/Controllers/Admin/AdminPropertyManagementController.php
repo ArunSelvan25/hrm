@@ -8,11 +8,18 @@ use App\Models\Property;
 
 class AdminPropertyManagementController extends Controller
 {
+    /**
+     * @param Property $property
+     */
     public function __construct(Property $property)
     {
         $this->property = $property;
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function addProperty(Request $request)
     {
         $this->property->create([
@@ -24,11 +31,18 @@ class AdminPropertyManagementController extends Controller
         return redirect()->route('admin.property')->with('success','Property Created successfully');
     }
 
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function getProperty()
     {
         return view('admin.property.property');
     }
 
+    /**
+     * @param Request $request
+     * @return false|string
+     */
     public function propertyList(Request $request){
         $query = $this->property->with('houseOwner');
         $limit = $request->iDisplayLength;
@@ -191,6 +205,10 @@ class AdminPropertyManagementController extends Controller
         return json_encode($data);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editProperty(Request $request)
     {
         $propertyData = $this->property->findorFail($request->property_id);
@@ -201,6 +219,10 @@ class AdminPropertyManagementController extends Controller
         return back()->with('success','Property Edited successfully');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function deleteProperty(Request $request)
     {
         $propertyData = $this->property->findorFail($request->property_id);

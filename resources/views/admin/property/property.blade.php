@@ -1,9 +1,9 @@
 @extends('admin.layout.app')
-@section('title') Property Management | Admin @endsection('title')
+@section('title') Property Management | {{ getGuard() }} @endsection('title')
 
 @section('page-styles')
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet">
+{{--    <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet">--}}
 
 @endsection('page-styles')
 

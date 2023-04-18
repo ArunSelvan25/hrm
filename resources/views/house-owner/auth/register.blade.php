@@ -1,7 +1,7 @@
 
 @extends('house-owner.app')
 @section('title')
-    Registration | HouseOwner
+    Registration | {{ getGuard() }}
 @endsection('title')
 @section('content')
     <div class="container pt-5 mt-5">

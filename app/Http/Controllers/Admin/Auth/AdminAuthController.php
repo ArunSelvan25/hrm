@@ -37,7 +37,7 @@ class AdminAuthController extends Controller
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function getdashboard(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function getdashboard()
     {
         return view('admin.dashboard')->with('success','Login successfully');
     }
@@ -55,8 +55,8 @@ class AdminAuthController extends Controller
     /**
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function adminLogout(){
-        Auth::guard('admin')->logout();
+    public function logout(){
+        Auth::logout();
         return redirect()->route('admin.get-login');
     }
 

@@ -1,5 +1,5 @@
 @extends('admin.layout.app')
-@section('title') Tenant Management | Admin @endsection('title')
+@section('title') Tenant Management | {{ getGuard() }} @endsection('title')
 
 @section('page-styles')
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">

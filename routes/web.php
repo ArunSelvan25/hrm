@@ -5,7 +5,7 @@ use App\Http\Controllers\FileManagementController;
 use App\Http\Controllers\Admin\{Auth\AdminAuthController, RolesAndPermissionController, AdminHouseOwnerManagement,
     AdminPropertyManagementController};
 use App\Http\Controllers\HouseOwner\HouseOwnerAuthController;
-use App\Http\Controllers\{TenantManagementController, UserManagementController};
+use App\Http\Controllers\{TenantManagementController, UserManagementController, Tenant\Auth\TenantAuthController, User\Auth\UserAuthController};
 
 /*
 |--------------------------------------------------------------------------
@@ -27,12 +27,12 @@ Route::controller(FileManagementController::class)->prefix('file')->group(functi
     Route::post('/build/disk','onTimeDisks')->name('file.build');
 });
 
-Route::prefix('admin')->middleware('adminAuth')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->group(function () {
     Route::controller(AdminAuthController::class)->group(function () {
-        Route::get('/login', 'getLogin')->name('get-login')->withoutMiddleware('adminAuth');
-        Route::post('/login', 'postLogin')->name('post-login')->withoutMiddleware('adminAuth');
+        Route::get('/login', 'getLogin')->name('get-login');
+        Route::post('/login', 'postLogin')->name('post-login');
         Route::get('/dashboard', 'getdashboard')->name('get-dashboard');
-        Route::get('/logout', 'adminLogout')->name('logout');
+        Route::get('/logout', 'logout')->name('logout');
 //    Route::get('/get-notification','getNotification')->name('get-notification');
         Route::get('/notification/delete', 'deleteNotification')->name('delete');
         Route::get('/notification/mark-as-read/{id}', 'markAsReadNotification')->name('mark-as-read');
@@ -79,4 +79,19 @@ Route::controller(HouseOwnerAuthController::class)->prefix('house-owner')->name(
     Route::get('/register','getRegister')->name('get-register');
     Route::post('/register','postRegister')->name('post-register');
 
+    Route::get('/login','getLogin')->name('get-login');
+    Route::post('/login','postLogin')->name('post-login');
+    Route::get('/logout', 'logout')->name('logout');
+});
+
+Route::controller(TenantAuthController::class)->prefix('tenant')->name('tenant.')->group(function () {
+    Route::get('/login','getLogin')->name('get-login');
+    Route::post('/login','postLogin')->name('post-login');
+    Route::get('/logout', 'logout')->name('logout');
+});
+
+Route::controller(UserAuthController::class)->prefix('user')->name('web.')->group(function () {
+    Route::get('/login','getLogin')->name('get-login');
+    Route::post('/login','postLogin')->name('post-login');
+    Route::get('/logout', 'logout')->name('logout');
 });

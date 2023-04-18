@@ -1,5 +1,5 @@
 @extends('admin.layout.app')
-@section('title') Dashboard | Admin @endsection('title')
+@section('title') Dashboard | {{ getGuard() }} @endsection('title')
 @section('content')
 
 @endsection('content')

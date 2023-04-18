@@ -1,5 +1,5 @@
 @extends('admin.app')
-@section('title') Login | Admin @endsection('title')
+@section('title') Login | {{ getGuard() }} @endsection('title')
 @section('content')
     <div class="container pt-5 mt-5">
         <div class="card mx-auto col-3">

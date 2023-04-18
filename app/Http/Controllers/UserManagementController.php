@@ -6,17 +6,31 @@ use App\Http\Requests\{UserRegisterRequest, UserEditRequest};
 use Illuminate\Http\Request;
 use App\Models\{User};
 use Illuminate\Support\Facades\{Hash, Crypt, Http};
+
+/**
+ *
+ */
 class UserManagementController extends Controller
 {
+    /**
+     * @param User $user
+     */
     public function __construct(User $user) {
         $this->user = $user;
     }
 
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function getUser()
     {
         return view('admin.user.user');
     }
 
+    /**
+     * @param UserRegisterRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function addUser(UserRegisterRequest $request)
     {
         $this->user->create([
@@ -31,6 +45,10 @@ class UserManagementController extends Controller
         return redirect()->route('admin.user')->with('success','User Created successfully');
     }
 
+    /**
+     * @param Request $request
+     * @return false|string
+     */
     public function userList(Request $request){
         $query = $this->user->with('tenant','tenant.property');
         $limit = $request->iDisplayLength;
@@ -150,6 +168,10 @@ class UserManagementController extends Controller
         return json_encode($data);
     }
 
+    /**
+     * @param UserEditRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editUser(UserEditRequest $request)
     {
         $userData = $this->user->findorFail($request->user_id);
@@ -161,6 +183,10 @@ class UserManagementController extends Controller
         return back()->with('success','User Edited successfully');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function deleteUser(Request $request)
     {
         $userData = $this->user->findorFail($request->user_id);

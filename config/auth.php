@@ -36,14 +36,15 @@ return [
     */
 
     'guards' => [
-        'admin' => [
-            'driver' => 'session',
-            'provider' => 'admin',
-        ],
         'house-owner' => [
             'driver' => 'session',
             'provider' => 'house-owner',
         ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admin',
+        ],
+
         'tenant' => [
             'driver' => 'session',
             'provider' => 'tenant',

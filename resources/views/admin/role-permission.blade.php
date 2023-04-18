@@ -1,29 +1,60 @@
 @extends('admin.layout.app')
-@section('title') Roles And Permission | Admin @endsection('title')
+@section('title') Roles And Permission | {{ getGuard() }} @endsection('title')
 @section('content')
-    <h3 class="text-dark">Roles</h3>
-    <div>
-        <form method="post" action="{{ route('admin.create-role') }}">
-            @csrf
-            @if(Auth::guard('admin')->user()->hasPermissionTo('role-list', 'admin'))
-                <div class="form-floating mb-3">
-                    <label for="role text-dark">New Role</label>
-                    <input name="role" type="text" class="form-control" id="role">
-                </div>
-            @endif
-            @foreach($permissions as $permission)
-                <div class="form-check form-check-inline p-5">
-                    <input class="form-check-input" type="checkbox" name="permission[]" id="inlineCheckbox{{$permission->id}}" value="{{ $permission->id }}">
-                    <label class="form-check-label text-dark" for="inlineCheckbox{{$permission->id}}">{{ $permission->name }}</label>
-                </div>
-            @endforeach
-            @role('Admin', 'admin')
-                <button class="btn btn-primary" type="submit">Add role</button>
-            @endrole
 
-        </form>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row col-md-12">
+                Add Role
+            </div>
+        </div>
 
+        <div class="card-body col-md-12">
+            <div class="">
+                <form method="post" action="{{ route('admin.create-role') }}">
+                    @csrf
+                    @if(Auth::guard('admin')->user()->hasPermissionTo('role-create', 'admin'))
+                        <div class="mb-3">
+                            <label for="role_name" class="form-label">Select House Owner</label>
+                            <input type="text" name="role_name" class="form-control" id="role_name" placeholder="role">
+                        </div>
+
+                        <div class="row col-md-12">
+                            <div class="mb-3 col-md-6">
+                                <label for="permission_name" class="form-label">Select Permission</label>
+                                <select class="select-2 form-label" style="width:100%" name="permission_name[]" id="permission_name" multiple="multiple" placeholder="Select permission">
+                                    <option selected="true" disabled>Select Permission</option>
+                                    @foreach($permissions as $permission)
+                                        <option value="{{$permission}}">{{$permission}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3 col-md-6">
+                                <label for="guard_name" class="form-label">Select guard</label>
+                                <select class="select-2 form-label" style="width:100%" name="guard_name" id="guard_name" placeholder="Select guard">
+                                    <option selected="true" disabled>Select Guard</option>
+                                    @foreach($guards as $guard)
+                                        <option value="{{$guard}}">{{$guard}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <button class="btn btn-primary" type="submit">Add role</button>
+                        </div>
+                    @endif
+                </form>
+            </div>
+        </div>
     </div>
 
 
 @endsection('content')
+
+@section('script')
+    <script>
+        $('.select-2').select2();
+    </script>
+@endsection('script')

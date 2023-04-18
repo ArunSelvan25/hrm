@@ -64,7 +64,6 @@
 
     @yield('page-script')
     <script>
-{{--        @dd(session()->all())--}}
 
         @if(Session::has('errors'))
         swal("Oops!",  "{{Session::get('error')}}", 'error');
@@ -91,12 +90,12 @@
             let ip_address = '127.0.0.1';
             let socket_port = '3000';
             let socket = io(ip_address+ ':' +socket_port);
-            socket.on('houseOwnerCreatedNotification', (message) => {
-                var oldValue = {{ getNotificationsCount() }};
-                var newValue = 1;
-                alert(oldValue)
-                $('#notification_count').text( oldValue + newValue);
-            });
+            {{--socket.on('houseOwnerCreatedNotification', (message) => {--}}
+            {{--    var oldValue = {{ getNotificationsCount() }};--}}
+            {{--    var newValue = 1;--}}
+            {{--    alert(oldValue)--}}
+            {{--    $('#notification_count').text( oldValue + newValue);--}}
+            {{--});--}}
         })
     </script>
 
