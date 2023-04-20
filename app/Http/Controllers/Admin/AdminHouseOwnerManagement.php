@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\HouseOwner;
 use Spatie\Permission\Models\{Role, Permission};
 use App\Http\Requests\HouseOwnerEditRequest;
+use Illuminate\Support\Facades\Auth;
 
 class AdminHouseOwnerManagement extends Controller
 {
@@ -16,6 +17,9 @@ class AdminHouseOwnerManagement extends Controller
     public function __construct(HouseOwner $houseOwner)
     {
         $this->houseOwner = $houseOwner;
+        $this->middleware(['permission:owner-list'])->only('getHouseOwner');
+        $this->middleware(['permission:owner-edit'])->only('editHouseOwner');
+        $this->middleware(['permission:owner-delete'])->only('deleteHouseOwner');
     }
 
     /**
@@ -54,24 +58,15 @@ class AdminHouseOwnerManagement extends Controller
         $data = $query->latest()->get();
         $column = array();
         foreach ($data as $value) {
-            $action = '<button class="btn btn-outline-success" href="#" data-toggle="modal"
-                                data-target="#propertyAddModal-'.$value->id.'">
+            $action = '';
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("property-create",getGuard())) {
+                $action .= '<button class="btn btn-outline-success" href="#" data-toggle="modal"
+                                data-target="#propertyAddModal-' . $value->id . '">
                             <i class="fas fa-solid fa-home"></i>
                             Add Property
                             </button>
-                             <button class="btn btn-outline-primary" href="#" data-toggle="modal"
-                                data-target="#houseOwnerEditModal-'.$value->id.'">
-                                <i class="fas fa-solid fa-user-edit"></i>
-                                Edit
-                             </button>
-                              <button class="btn btn-outline-warning" href="#" data-toggle="modal"
-                                data-target="#houseOwnerDeleteModal-'.$value->id.'">
-                                <i class="fas fa-solid fa-trash"></i>
-                                Delete
-                             </button>
 
-
-                             <div class="modal fade" id="propertyAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyAdd-'.$value->id.'"
+                            <div class="modal fade" id="propertyAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyAdd-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <form class="container" method="post" action="'.route('admin.property.add').'">
@@ -101,9 +96,14 @@ class AdminHouseOwnerManagement extends Controller
                                         </div>
                                     </form>
                                 </div>
-                            </div>
-
-
+                            </div>';
+            }
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("owner-edit",getGuard())) {
+                $action .= '<button class="btn btn-outline-primary" href="#" data-toggle="modal"
+                                data-target="#houseOwnerEditModal-' . $value->id . '">
+                                <i class="fas fa-solid fa-user-edit"></i>
+                                Edit
+                             </button>
 
                              <div class="modal fade" id="houseOwnerEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerEdit-'.$value->id.'"
                                  aria-hidden="true">
@@ -135,10 +135,17 @@ class AdminHouseOwnerManagement extends Controller
                                         </div>
                                     </form>
                                 </div>
-                            </div>
+                            </div>';
+            }
 
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("owner-delete",getGuard())) {
+                $action .= '<button class="btn btn-outline-warning" href="#" data-toggle="modal"
+                                data-target="#houseOwnerDeleteModal-'.$value->id.'">
+                                <i class="fas fa-solid fa-trash"></i>
+                                Delete
+                             </button>
 
-                            <div class="modal fade" id="houseOwnerDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerDelete-'.$value->id.'"
+                             <div class="modal fade" id="houseOwnerDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerDelete-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <form class="container" method="post" action="'.route('admin.house-owner.delete').'">
@@ -162,10 +169,12 @@ class AdminHouseOwnerManagement extends Controller
                                     </form>
                                 </div>
                             </div>';
+            }
+
             $col['id'] = $offset+1;
             $col['name'] = $value->name ?? '-';
             $col['email'] =$value->email ?? '-';
-            $col['action']=$action ?? '-';
+            $col['action']=($action != '') ? $action : '-';
 
             array_push($column, $col);
             $offset++;

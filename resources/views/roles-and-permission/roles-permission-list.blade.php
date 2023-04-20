@@ -27,7 +27,7 @@
                     <div class="modal fade" id="changePermission-{{ $role->id }}" tabindex="-1" role="dialog" aria-labelledby="permission-{{ $role->id }}"
                          aria-hidden="true">
                         <div class="modal-dialog" role="document">
-                            <form class="container" method="post" action="#">
+                            <form class="container" method="post" action="{{ route('role-permission.sync-permission') }}">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="permission-{{ $role->id }}">Change permission <strong>{{ $role->name }}</strong> role</h5>
@@ -38,20 +38,24 @@
                                     <div class="modal-body">
                                         @csrf
                                         <input type="hidden" name="role_id" value="{{ $role->id }}" readonly>
-                                        <div class="mb-3 col-md-6">
+                                        <div class="mb-3 col-md-12">
                                             @php
                                                 $guardPermissions = $permissions->where('guard_name',$role->guard_name)->get();
                                                 $getPermission = array();
                                                 foreach($role->permissions as $rolePermission) {
-                                                    $getPermission[] = $rolePermission->name;
+                                                    $getPermission[] = $rolePermission->id;
                                                 }
                                             @endphp
-                                            @foreach($guardPermissions as $permission)
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" @if(in_array($permission->name,$getPermission)) checked @endif class="custom-control-input" id="{{ $permission->id }}">
-                                                    <label class="custom-control-label" for="{{ $permission->id }}">{{ $permission->name }}</label>
-                                                </div>
-                                            @endforeach
+
+                                                @foreach($guardPermissions as $permission)
+                                                    <div class="row">
+                                                        <div class="custom-control col-md-6 custom-checkbox">
+                                                            <input type="checkbox" name="permission_id[]" @if(in_array($permission->id,$getPermission)) checked @endif value="{{ $permission->id }}" class="custom-control-input" id="{{ $permission->id }}">
+                                                            <label class="custom-control-label" for="{{ $permission->id }}">{{ $permission->name }}</label>
+                                                        </div>
+                                                    </div>
+                                                 @endforeach
+
                                         </div>
                                     </div>
                                     <div class="modal-footer">

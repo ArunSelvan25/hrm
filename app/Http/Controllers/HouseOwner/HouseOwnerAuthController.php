@@ -33,9 +33,9 @@ class HouseOwnerAuthController extends Controller
             'password' => Hash::make($request['password']),
             'original_password' => Crypt::encryptString($request['password']),
         ])->assignRole('house-owner');
-        $admin = Admin::first();
-        $admin->notify(new HouseOwnerCreatedNotification($houseOwner));
-        Http::get('127.0.0.1:3000/house-owner-created');
+//        $admin = Admin::first();
+//        $admin->notify(new HouseOwnerCreatedNotification($houseOwner));
+//        Http::get('127.0.0.1:3000/house-owner-created');
         return back()->with('success','House owner created successfully');
     }
 

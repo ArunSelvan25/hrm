@@ -27,7 +27,7 @@ Route::controller(FileManagementController::class)->prefix('file')->group(functi
     Route::post('/build/disk','onTimeDisks')->name('file.build');
 });
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->middleware('auth:admin,house-owner,tenant,web')->name('admin.')->group(function () {
     Route::controller(AdminAuthController::class)->group(function () {
         Route::get('/login', 'getLogin')->name('get-login');
         Route::post('/login', 'postLogin')->name('post-login');
@@ -45,9 +45,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::controller(AdminHouseOwnerManagement::class)->group(function () {
         Route::get('/house-owner', 'getHouseOwner')->name('house-owner');
-        Route::get('/house-owner/list', 'houseOwnerList')->name('house-owner.list');
-        Route::post('/house-owner/edit', 'editHouseOwner')->name('house-owner.edit');
-        Route::post('/house-owner/delete', 'deleteHouseOwner')->name('house-owner.delete');
+//            ->middleware('permission:owner-list');
+        Route::get('/house-owner/list', 'houseOwnerList')->name('house-owner.list')
+            ->middleware('permission:owner-list');
+        Route::post('/house-owner/edit', 'editHouseOwner')->name('house-owner.edit')
+            ->middleware('permission:owner-edit');
+        Route::post('/house-owner/delete', 'deleteHouseOwner')->name('house-owner.delete')
+            ->middleware('permission:owner-delete');
     });
 
     Route::controller(AdminPropertyManagementController::class)->group(function () {
@@ -96,6 +100,10 @@ Route::controller(UserAuthController::class)->prefix('user')->name('web.')->grou
     Route::get('/logout', 'logout')->name('logout');
 });
 
-Route::controller(RolesAndPermissionController::class)->group(function () {
-    Route::get('/role-permission/list', 'listRolePermission')->name('role-permission.list');
+Route::controller(RolesAndPermissionController::class)
+    ->prefix('role-permission')
+    ->name('role-permission.')
+    ->group(function () {
+    Route::get('/list', 'listRolePermission')->name('list');
+    Route::post('/sync-permission', 'syncPermissionWithRole')->name('sync-permission');
 });

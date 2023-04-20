@@ -14,6 +14,7 @@ class RolesAndPermissionController extends Controller
     public function __construct(Role $role, Permission $permission) {
         $this->role = $role;
         $this->permission = $permission;
+        $this->middleware('role:admin');
     }
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
@@ -124,5 +125,13 @@ class RolesAndPermissionController extends Controller
         $data['iTotalDisplayRecords']=$totalCount;
 
         return json_encode($data);
+    }
+
+    public function syncPermissionWithRole(Request $request)
+    {
+        $roleToAssignPermission = $this->role->where('id',$request->role_id)->first();
+        $permissionToRole = $this->permission->whereIn('id',$request->permission_id)->get();
+        $roleToAssignPermission->syncPermissions($permissionToRole);
+        return back()->with('success','Permission assigned successfully to role '.$roleToAssignPermission->name);
     }
 }

@@ -19,7 +19,7 @@
             <span>Dashboard</span></a>
     </li>
 
-    @if(Auth::guard(getGuard())->user() && Auth::guard(getGuard())->user()->hasPermissionTo('role-list',getGuard()))
+    @role('admin','admin')
         <!-- Divider -->
         <hr class="sidebar-divider">
 
@@ -31,7 +31,9 @@
                 <span>Access Management</span>
             </a>
         </li>
+    @endrole
 
+    @if(Auth::guard(getGuard())->user()->hasPermissionTo("owner-list",getGuard()))
         <!-- Divider -->
         <hr class="sidebar-divider">
 
@@ -45,17 +47,19 @@
         </li>
     @endif
 
-    <!-- Divider -->
-    <hr class="sidebar-divider">
+    @if(Auth::guard(getGuard())->user()->hasPermissionTo("property-list",getGuard()))
+        <!-- Divider -->
+        <hr class="sidebar-divider">
 
-    <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item">
-        <a class="nav-link collapsed {{ (request()->is('*admin/property*')) ? 'bg-primary text-white' : '' }}" href="{{ route('admin.property') }}"
-           aria-expanded="true" aria-controls="collapseTwo">
-           <i class="fas fa-solid fa-home"></i>
-            <span>Property Management</span>
-        </a>
-    </li>
+        <!-- Nav Item - Pages Collapse Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed {{ (request()->is('*admin/property*')) ? 'bg-primary text-white' : '' }}" href="{{ route('admin.property') }}"
+               aria-expanded="true" aria-controls="collapseTwo">
+               <i class="fas fa-solid fa-home"></i>
+                <span>Property Management</span>
+            </a>
+        </li>
+    @endif
 
     <!-- Divider -->
     <hr class="sidebar-divider">

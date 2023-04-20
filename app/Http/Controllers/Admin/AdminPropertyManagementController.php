@@ -72,13 +72,16 @@ class AdminPropertyManagementController extends Controller
                                 data-target="#tenantAddModal-'.$value->id.'">
                             <i class="fas fa-solid fa-user-tie"></i>
                             Add Tenant
-                            </button>
-                             <button class="btn btn-outline-primary" href="#" data-toggle="modal"
+                            </button>';
+            dd(Auth::guard(getGuard())->user()->getAllPermissions());
+                            if(Auth::guard(getGuard())->user()->hasPermissionTo("property-edit",getGuard())){
+                            $action .= '<button class="btn btn-outline-primary" href="#" data-toggle="modal"
                                 data-target="#propertyEditModal-'.$value->id.'">
                                 <i class="fas fa-solid fa-pen"></i>
                                 Edit
-                             </button>
-                              <button class="btn btn-outline-warning" href="#" data-toggle="modal"
+                             </button>';
+                             }
+                      $action .= '<button class="btn btn-outline-warning" href="#" data-toggle="modal"
                                 data-target="#propertyDeleteModal-'.$value->id.'">
                                 <i class="fas fa-solid fa-trash"></i>
                                 Delete
