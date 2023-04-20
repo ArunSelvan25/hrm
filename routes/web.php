@@ -95,3 +95,7 @@ Route::controller(UserAuthController::class)->prefix('user')->name('web.')->grou
     Route::post('/login','postLogin')->name('post-login');
     Route::get('/logout', 'logout')->name('logout');
 });
+
+Route::controller(RolesAndPermissionController::class)->group(function () {
+    Route::get('/role-permission/list', 'listRolePermission')->name('role-permission.list');
+});

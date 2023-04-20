@@ -18,12 +18,8 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
-{{--    @dd(Auth::guard('admin')->user()->can('role-list'))--}}
-{{--    @dd(can('role-list'))--}}
-    @if((Auth::guard('admin')->user() && Auth::guard('admin')->user()->hasPermissionTo('role-list','admin')) ||
-        (Auth::guard('house-owner')->user() && Auth::guard('house-owner')->user()->hasPermissionTo('role-list','house-owner'))
-        )
-{{--    @can('role-list')--}}
+
+    @if(Auth::guard(getGuard())->user() && Auth::guard(getGuard())->user()->hasPermissionTo('role-list',getGuard()))
         <!-- Divider -->
         <hr class="sidebar-divider">
 
@@ -31,7 +27,7 @@
         <li class="nav-item">
             <a class="nav-link collapsed" href="{{ route('admin.role-permission') }}"
                 aria-expanded="true" aria-controls="collapseTwo">
-                <i class="fas fa-fw fa-cog"></i>
+                <i class="fas fa-fw fa-unlock"></i>
                 <span>Access Management</span>
             </a>
         </li>
@@ -47,7 +43,6 @@
                 <span>Owner Management</span>
             </a>
         </li>
-{{--    @endcan--}}
     @endif
 
     <!-- Divider -->
