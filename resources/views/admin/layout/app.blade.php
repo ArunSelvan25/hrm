@@ -66,7 +66,7 @@
     <script>
 
         @if(Session::has('errors'))
-        swal("Oops!",  "{{Session::get('error')}}", 'error');
+        swal("Oops!",  "{{Session::get('errors')}}", 'error');
         @elseif(Session::has('success'))
             swal("Success!", "{{Session::get('success')}}", 'success');
         @endif

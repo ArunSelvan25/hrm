@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\HouseOwner;
-use Spatie\Permission\Models\{Role, Permission};
+use Exception;
 use App\Http\Requests\HouseOwnerEditRequest;
-use Illuminate\Support\Facades\Auth;
+use App\Models\HouseOwner;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\{Auth, Log};
 
-class AdminHouseOwnerManagement extends Controller
+class HouseOwnerManagementController extends Controller
 {
     /**
      * @param HouseOwner $houseOwner
@@ -26,7 +25,12 @@ class AdminHouseOwnerManagement extends Controller
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function getHouseOwner(){
-        return view('admin.house-owner.house-owner');
+        try {
+            return view('house-owner.house-owner');
+        } catch (Exception $e) {
+            Log::error('getHouseOwner',[$e]);
+            return back()->with('errors',$e->getMessage());
+        }
     }
 
     /**
@@ -108,7 +112,7 @@ class AdminHouseOwnerManagement extends Controller
                              <div class="modal fade" id="houseOwnerEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerEdit-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.house-owner.edit').'">
+                                    <form class="container" method="post" action="'.route('house-owner.edit').'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="houseOwnerEdit-'.$value->id.'">Edit house owner</h5>
@@ -148,7 +152,7 @@ class AdminHouseOwnerManagement extends Controller
                              <div class="modal fade" id="houseOwnerDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerDelete-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.house-owner.delete').'">
+                                    <form class="container" method="post" action="'.route('house-owner.delete').'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="houseOwnerDelete-'.$value->id.'">Delete House Owner</h5>
@@ -193,12 +197,17 @@ class AdminHouseOwnerManagement extends Controller
      */
     public function editHouseOwner(HouseOwnerEditRequest $request)
     {
-        $houseOwnerData = $this->houseOwner->findorFail($request->owner_id);
-        $houseOwnerData->update([
-            'name' => $request['name'],
-            'email' => $request['email']
-        ]);
-        return back()->with('success','Owner Edited successfully');
+        try {
+            $houseOwnerData = $this->houseOwner->findorFail($request->owner_id);
+            $houseOwnerData->update([
+                'name' => $request['name'],
+                'email' => $request['email']
+            ]);
+            return back()->with('success','Owner Edited successfully');
+        } catch (Exception $e) {
+            Log::error('editHouseOwner',[$e]);
+            return back()->with('errors',$e->getMessage());
+        }
     }
 
     /**
@@ -207,8 +216,13 @@ class AdminHouseOwnerManagement extends Controller
      */
     public function deleteHouseOwner(Request $request)
     {
-        $houseOwnerData = $this->houseOwner->findorFail($request->owner_id);
-        $houseOwnerData->delete();
-        return back()->with('success','Owner Deleted successfully');
+        try {
+            $houseOwnerData = $this->houseOwner->findorFail($request->owner_id);
+            $houseOwnerData->delete();
+            return back()->with('success','Owner Deleted successfully');
+        } catch (Exception $e) {
+            Log::error('editHouseOwner',[$e]);
+            return back()->with('errors',$e->getMessage());
+        }
     }
 }

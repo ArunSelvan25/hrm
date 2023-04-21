@@ -14,7 +14,7 @@
 
     <!-- Nav Item - Dashboard -->
     <li class="nav-item">
-        <a class="nav-link {{ (request()->is('*admin/dashboard')) ? 'bg-primary text-white' : '' }}" href="{{ route('admin.get-dashboard') }}">
+        <a class="nav-link {{ (request()->is('*/dashboard')) ? 'bg-primary text-white' : '' }}" href="{{ route('get-dashboard') }}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
@@ -25,7 +25,7 @@
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="{{ route('admin.role-permission') }}"
+            <a class="nav-link collapsed" href="{{ route('role-permission.view') }}"
                 aria-expanded="true" aria-controls="collapseTwo">
                 <i class="fas fa-fw fa-unlock"></i>
                 <span>Access Management</span>
@@ -39,7 +39,7 @@
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed {{ (request()->is('*admin/house-owner*')) ? 'bg-primary text-white' : '' }}" href="{{ route('admin.house-owner') }}"
+            <a class="nav-link collapsed {{ (request()->is('*house-owner*')) ? 'bg-primary text-white' : '' }}" href="{{ route('house-owner.house-owner') }}"
                aria-expanded="true" aria-controls="collapseTwo">
                 <i class="fas fa-fw fa-cog"></i>
                 <span>Owner Management</span>
@@ -53,7 +53,7 @@
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed {{ (request()->is('*admin/property*')) ? 'bg-primary text-white' : '' }}" href="{{ route('admin.property') }}"
+            <a class="nav-link collapsed {{ (request()->is('*admin/property*')) ? 'bg-primary text-white' : '' }}" href="{{ route('property.property') }}"
                aria-expanded="true" aria-controls="collapseTwo">
                <i class="fas fa-solid fa-home"></i>
                 <span>Property Management</span>

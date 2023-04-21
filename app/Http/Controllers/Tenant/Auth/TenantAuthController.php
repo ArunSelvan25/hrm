@@ -25,7 +25,7 @@ class TenantAuthController extends Controller
             'password' => $request['password']
         ];
         if($this->authAttempt($data,'tenant')) {
-            return redirect()->route('admin.get-dashboard');
+            return redirect()->route('get-dashboard');
         }
         return back()->with('errors','Credentials not matched');
     }

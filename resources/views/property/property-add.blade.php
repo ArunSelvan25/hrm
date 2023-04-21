@@ -1,12 +1,15 @@
 <div class="col-md-10">
     <h4 class="m-0 font-weight-bold text-primary">Property List</h4>
 </div>
-<div class="col-md-2">
-    <button class="btn btn-primary" href="#" data-toggle="modal" data-target="#houseOwnerModal">
-        <i class="fas fa-solid fa-home"></i>
-        Add Property
-    </button>
-</div>
+
+@if(Auth::guard(getGuard())->user()->hasPermissionTo("property-create",getGuard()))
+    <div class="col-md-2">
+        <button class="btn btn-primary" href="#" data-toggle="modal" data-target="#houseOwnerModal">
+            <i class="fas fa-solid fa-home"></i>
+            Add Property
+        </button>
+    </div>
+@endif
 
 
 {{--    Property Add modal    --}}

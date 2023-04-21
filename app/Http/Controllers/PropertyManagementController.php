@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Property;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\{Auth, Log};
 
-class AdminPropertyManagementController extends Controller
+class PropertyManagementController extends Controller
 {
     /**
      * @param Property $property
@@ -14,6 +14,10 @@ class AdminPropertyManagementController extends Controller
     public function __construct(Property $property)
     {
         $this->property = $property;
+        $this->middleware(['permission:property-create'])->only('addProperty');
+        $this->middleware(['permission:property-list'])->only('getProperty,propertyList');
+        $this->middleware(['permission:property-edit'])->only('editProperty');
+        $this->middleware(['permission:property-delete'])->only('deleteProperty');
     }
 
     /**
@@ -22,13 +26,18 @@ class AdminPropertyManagementController extends Controller
      */
     public function addProperty(Request $request)
     {
-        $this->property->create([
-            'house_owner_id' => $request->house_owner_id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => 1,
-        ]);
-        return redirect()->route('admin.property')->with('success','Property Created successfully');
+        try {
+            $this->property->create([
+                'house_owner_id' => $request->house_owner_id,
+                'title' => $request->title,
+                'description' => $request->description,
+                'status' => 1,
+            ]);
+            return redirect()->route('property.property')->with('success','Property Created successfully');
+        } catch (Exception $e) {
+            Log::error('addProperty',[$e]);
+            return back()->with('errors',$e->getMessage());
+        }
     }
 
     /**
@@ -36,7 +45,12 @@ class AdminPropertyManagementController extends Controller
      */
     public function getProperty()
     {
-        return view('admin.property.property');
+        try {
+            return view('property.property');
+        } catch (Exception $e) {
+            Log::error('addProperty',[$e]);
+            return back()->with('errors',$e->getMessage());
+        }
     }
 
     /**
@@ -68,27 +82,15 @@ class AdminPropertyManagementController extends Controller
         $data = $query->latest()->get();
         $column = array();
         foreach ($data as $value) {
-            $action = '<button class="btn btn-outline-success" href="#" data-toggle="modal"
-                                data-target="#tenantAddModal-'.$value->id.'">
+            $action = '';
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("tenant-create",getGuard())) {
+                $action = '<button class="btn btn-outline-success" href="#" data-toggle="modal"
+                                data-target="#tenantAddModal-' . $value->id . '">
                             <i class="fas fa-solid fa-user-tie"></i>
                             Add Tenant
-                            </button>';
-            dd(Auth::guard(getGuard())->user()->getAllPermissions());
-                            if(Auth::guard(getGuard())->user()->hasPermissionTo("property-edit",getGuard())){
-                            $action .= '<button class="btn btn-outline-primary" href="#" data-toggle="modal"
-                                data-target="#propertyEditModal-'.$value->id.'">
-                                <i class="fas fa-solid fa-pen"></i>
-                                Edit
-                             </button>';
-                             }
-                      $action .= '<button class="btn btn-outline-warning" href="#" data-toggle="modal"
-                                data-target="#propertyDeleteModal-'.$value->id.'">
-                                <i class="fas fa-solid fa-trash"></i>
-                                Delete
-                             </button>
+                            </button>
 
-
-                             <div class="modal fade" id="tenantAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="tenantAdd-'.$value->id.'"
+                            <div class="modal fade" id="tenantAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="tenantAdd-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <form class="container" method="post" action="'. route('admin.tenant.add').'">
@@ -130,11 +132,17 @@ class AdminPropertyManagementController extends Controller
                                         </div>
                                     </form>
                                 </div>
-                            </div>
+                            </div>';
+            }
 
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("property-edit",getGuard())){
+                $action .= '<button class="btn btn-outline-primary" href="#" data-toggle="modal"
+                                data-target="#propertyEditModal-'.$value->id.'">
+                                <i class="fas fa-solid fa-pen"></i>
+                                Edit
+                            </button>
 
-
-                             <div class="modal fade" id="propertyEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyEdit-'.$value->id.'"
+                            <div class="modal fade" id="propertyEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyEdit-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <form class="container" method="post" action="'.route('admin.property.edit').'">
@@ -164,10 +172,17 @@ class AdminPropertyManagementController extends Controller
                                         </div>
                                     </form>
                                 </div>
-                            </div>
+                            </div>';
+            }
 
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("property-delete",getGuard())){
+                $action .= '<button class="btn btn-outline-warning" href="#" data-toggle="modal"
+                                data-target="#propertyDeleteModal-'.$value->id.'">
+                                <i class="fas fa-solid fa-trash"></i>
+                                Delete
+                             </button>
 
-                            <div class="modal fade" id="propertyDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyDelete-'.$value->id.'"
+                             <div class="modal fade" id="propertyDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyDelete-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <form class="container" method="post" action="'.route('admin.property.delete').'">
@@ -191,11 +206,13 @@ class AdminPropertyManagementController extends Controller
                                     </form>
                                 </div>
                             </div>';
+            }
+
             $col['id'] = $offset+1;
             $col['title'] = $value->title ?? '-';
             $col['house_owner'] = $value->houseOwner->name ?? '-';
             $col['description'] =$value->description ?? '-';
-            $col['action']=$action ?? '-';
+            $col['action']=($action != '') ? $action : '-';
 
             array_push($column, $col);
             $offset++;
@@ -214,12 +231,17 @@ class AdminPropertyManagementController extends Controller
      */
     public function editProperty(Request $request)
     {
-        $propertyData = $this->property->findorFail($request->property_id);
-        $propertyData->update([
-            'title' => $request->title,
-            'description' => $request->description
-        ]);
-        return back()->with('success','Property Edited successfully');
+        try {
+            $propertyData = $this->property->findorFail($request->property_id);
+            $propertyData->update([
+                'title' => $request->title,
+                'description' => $request->description
+            ]);
+            return back()->with('success','Property Edited successfully');
+        } catch (Exception $e) {
+            Log::error('editProperty',[$e]);
+            return back()->with('errors',$e->getMessage());
+        }
     }
 
     /**
@@ -228,8 +250,13 @@ class AdminPropertyManagementController extends Controller
      */
     public function deleteProperty(Request $request)
     {
-        $propertyData = $this->property->findorFail($request->property_id);
-        $propertyData->delete();
-        return back()->with('success','Property Deleted successfully');
+        try {
+            $propertyData = $this->property->findorFail($request->property_id);
+            $propertyData->delete();
+            return back()->with('success','Property Deleted successfully');
+        } catch (Exception $e) {
+            Log::error('deleteProperty',[$e]);
+            return back()->with('errors',$e->getMessage());
+        }
     }
 }
