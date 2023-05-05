@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('house_owners', function (Blueprint $table) {
             $table->id();
-            $table->string('name',30);
-            $table->string('email',30)->unique();
+            $table->string('name');
+            $table->string('email')->unique();
             $table->string('password');
             $table->string('original_password');
             $table->tinyInteger('status')->default(1);

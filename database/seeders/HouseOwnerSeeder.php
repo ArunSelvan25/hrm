@@ -18,10 +18,10 @@ class HouseOwnerSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
 
-        for($i=0; $i <= 100; $i++){
+        for($i=1; $i <= 100; $i++){
             HouseOwner::create([
-                'name' => $faker->name(),
-                'email' => $faker->safeEmail,
+                'name' => 'HouseOwner '.$faker->name(28),
+                'email' => 'HouseOwner '.$faker->unique()->safeEmail,
                 'password' => Hash::make('Qwert@12345'),
                 'original_password' => Crypt::encryptString('Qwert@12345'),
             ]);
@@ -29,10 +29,36 @@ class HouseOwnerSeeder extends Seeder
 
         $houseOwners = HouseOwner::all();
         foreach($houseOwners as $houseOwner){
-            for($i=0; $i <= 4; $i++){
+            for($i=1; $i <= 4; $i++){
                 Property::create([
                     'house_owner_id' => $houseOwner->id,
-                    'title' => $houseOwner->name.' property '.$i,
+                    'title' => 'Property '.$houseOwner->name.' - '.$i,
+                ]);
+            }
+        }
+
+        $properties = Property::all();
+        foreach($properties as $property){
+            for($i=1; $i <= 4; $i++){
+                Tenant::create([
+                    'property_id' => $property->id,
+                    'name' => 'Tenant '.$faker->name(28),
+                    'email' => 'Tenant '.$faker->unique()->safeEmail,
+                    'password' => Hash::make('Qwert@12345'),
+                    'original_password' => Crypt::encryptString('Qwert@12345'),
+                ]);
+            }
+        }
+
+        $tenants = Tenant::all();
+        foreach($tenants as $tenant){
+            for($i=1; $i <= 4; $i++){
+                User::create([
+                    'tenant_id' => $tenant->id,
+                    'name' => 'User '.$faker->name(28),
+                    'email' => 'User '.$faker->unique()->safeEmail,
+                    'password' => Hash::make('Qwert@12345'),
+                    'original_password' => Crypt::encryptString('Qwert@12345'),
                 ]);
             }
         }

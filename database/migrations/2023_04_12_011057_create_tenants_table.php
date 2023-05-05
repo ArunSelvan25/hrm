@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('property_id');
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
-            $table->string('name',30);
-            $table->string('email',30);
+            $table->string('name');
+            $table->string('email');
             $table->integer('phone')->nullable();
             $table->string('password');
             $table->string('original_password');
