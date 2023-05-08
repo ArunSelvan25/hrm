@@ -1,4 +1,4 @@
-@extends('admin.layout.app')
+@extends('layout.app')
 @section('title')
     Property Management | {{ getGuard() }}
 @endsection('title')
@@ -12,6 +12,9 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <div class="row col-md-12">
+                <div class="col-md-10">
+                    <h4 class="m-0 font-weight-bold text-primary">{{ __('main_table.property.table_title') }}</h4>
+                </div>
                 @include('property.property-add')
             </div>
         </div>
@@ -53,7 +56,7 @@
                 "bProcessing": true,
                 "bServerSide": true,
                 "destroy": true,
-                "sAjaxSource": "{{url('/')}}/property/list",
+                "sAjaxSource": "{{url('/')}}/{{app()->getLocale()}}/property/list",
                 columns: [
                     {data: "id"},
                     {data: "title"},

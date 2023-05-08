@@ -6,8 +6,9 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\{HouseOwner, Property, Tenant, User};
 use Illuminate\Support\Facades\{Hash, Crypt};
+use Illuminate\Support\Str;
 
-class HouseOwnerSeeder extends Seeder
+class DataEntriesSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,13 +19,15 @@ class HouseOwnerSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
 
+
+        // Create house owners
         for($i=1; $i <= 100; $i++){
             HouseOwner::create([
-                'name' => 'HouseOwner '.$faker->name(28),
-                'email' => 'HouseOwner '.$faker->unique()->safeEmail,
+                'name' => 'Owner '.$faker->name(),
+                'email' => 'owner'.Str::random(8).'@mailinator.com',
                 'password' => Hash::make('Qwert@12345'),
                 'original_password' => Crypt::encryptString('Qwert@12345'),
-            ]);
+            ])->assignRole('house-owner');
         }
 
         $houseOwners = HouseOwner::all();
@@ -39,27 +42,25 @@ class HouseOwnerSeeder extends Seeder
 
         $properties = Property::all();
         foreach($properties as $property){
-            for($i=1; $i <= 4; $i++){
-                Tenant::create([
-                    'property_id' => $property->id,
-                    'name' => 'Tenant '.$faker->name(28),
-                    'email' => 'Tenant '.$faker->unique()->safeEmail,
-                    'password' => Hash::make('Qwert@12345'),
-                    'original_password' => Crypt::encryptString('Qwert@12345'),
-                ]);
-            }
+            Tenant::create([
+                'property_id' => $property->id,
+                'name' => 'Tenant '.$faker->name(),
+                'email' => 'tenant'.Str::random(8).'@mailinator.com',
+                'password' => Hash::make('Qwert@12345'),
+                'original_password' => Crypt::encryptString('Qwert@12345'),
+            ])->assignRole('tenant');
         }
 
         $tenants = Tenant::all();
         foreach($tenants as $tenant){
-            for($i=1; $i <= 4; $i++){
+            for($i=1; $i <= 3; $i++){
                 User::create([
                     'tenant_id' => $tenant->id,
-                    'name' => 'User '.$faker->name(28),
-                    'email' => 'User '.$faker->unique()->safeEmail,
+                    'name' => 'User '.$faker->name(),
+                    'email' => 'user'.Str::random(8).'@mailinator.com',
                     'password' => Hash::make('Qwert@12345'),
                     'original_password' => Crypt::encryptString('Qwert@12345'),
-                ]);
+                ])->assignRole('web');
             }
         }
         

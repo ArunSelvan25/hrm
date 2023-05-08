@@ -56,7 +56,7 @@ class HouseOwnerAuthController extends Controller
             'password' => $request['password']
         ];
         if($this->authAttempt($data,'house-owner')) {
-            return redirect()->route('get-dashboard');
+            return redirect()->route('get-dashboard',['locale' => app()->getLocale()]);
         }
         return back()->with('errors','Credentials not matched');
     }
@@ -68,7 +68,6 @@ class HouseOwnerAuthController extends Controller
      */
     public function authAttempt($data, $guard)
     {
-//        dd($data, $guard,Auth::guard('house-owner')->check());
         return Auth::guard($guard)->attempt($data);
     }
 
@@ -84,8 +83,8 @@ class HouseOwnerAuthController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(){
-        Auth::logout();
-        return redirect()->route('house-owner.get-login');
+        Auth::guard('house-owner')->logout();
+        return redirect()->route('house-owner.get-login',['locale' => app()->getLocale()]);
     }
 
 

@@ -36,13 +36,13 @@
 
     <div id="wrapper">
 
-        @include('admin.includes.sidebar')
+        @include('includes.sidebar')
 
         <div id="content-wrapper" class="d-flex flex-column">
 
             <!-- Main Content -->
             <div id="content">
-                @include('admin.includes.navbar')
+                @include('includes.navbar')
                 <div class="container-fluid">
                     @yield('content')
                 </div>

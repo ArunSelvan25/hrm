@@ -31,7 +31,25 @@ return new class extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('users', 'tenant_id')) {
+                $table->dropColumn('tenant_id');
+            }
+
+            if (Schema::hasColumn('users', 'phone')) {
+                $table->dropColumn('phone');
+            }
+
+            if (Schema::hasColumn('users', 'original_password')) {
+                $table->dropColumn('original_password');
+            }
+
+            if (Schema::hasColumn('users', 'status')) {
+                $table->dropColumn('status');
+            }
+
+            if (Schema::hasColumn('users', 'profile')) {
+                $table->dropColumn('profile');
+            }
         });
     }
 };

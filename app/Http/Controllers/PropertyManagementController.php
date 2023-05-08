@@ -58,7 +58,18 @@ class PropertyManagementController extends Controller
      * @return false|string
      */
     public function propertyList(Request $request){
-        $query = $this->property->with('houseOwner');
+        $query = $this->property->with('houseOwner')
+                    ->when(getGuard() == 'admin', function ($q) {
+                        return $q;
+                    })->when(getGuard() == 'house-owner', function ($q) {
+                        return $q->where('house_owner_id',auth()->guard('house-owner')->user()->id);
+                    })->when(getGuard() == 'tenant', function ($q) {
+                        return $q->where('id',auth()->guard('tenant')->user()->property_id);
+                    })->when(getGuard() == 'web', function ($q) {
+                        return $q->with('tenant')->whereHas('tenant', function($query){
+                            return $query->where('id',auth()->guard('web')->user()->tenant_id);
+                        });
+                    });
         $limit = $request->iDisplayLength;
         $offset = $request->iDisplayStart;
 
@@ -93,7 +104,7 @@ class PropertyManagementController extends Controller
                             <div class="modal fade" id="tenantAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="tenantAdd-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'. route('admin.tenant.add').'">
+                                    <form class="container" method="post" action="'. route('tenant.add',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="tenantAdd-'.$value->id.'">Add tenant for <strong>'.$value->title.'</strong></h5>
@@ -145,7 +156,7 @@ class PropertyManagementController extends Controller
                             <div class="modal fade" id="propertyEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyEdit-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.property.edit').'">
+                                    <form class="container" method="post" action="'.route('property.edit',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="propertyEdit-'.$value->id.'">Edit house owner</h5>
@@ -185,7 +196,7 @@ class PropertyManagementController extends Controller
                              <div class="modal fade" id="propertyDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyDelete-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.property.delete').'">
+                                    <form class="container" method="post" action="'.route('property.delete',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="propertyDelete-'.$value->id.'">Delete Property</h5>

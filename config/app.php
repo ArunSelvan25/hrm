@@ -110,6 +110,10 @@ return [
 
     'faker_locale' => 'en_US',
 
+    'available_locales' => [
+        'en', 'ta'
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

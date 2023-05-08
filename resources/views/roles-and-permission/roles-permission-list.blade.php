@@ -28,7 +28,7 @@
                          aria-labelledby="permission-{{ $role->id }}"
                          aria-hidden="true">
                         <div class="modal-dialog" role="document">
-                            <form class="container" method="post" action="{{ route('role-permission.sync-permission') }}">
+                            <form class="container" method="post" action="{{ route('role-permission.sync-permission',['locale' => app()->getLocale()]) }}">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="permission-{{ $role->id }}">

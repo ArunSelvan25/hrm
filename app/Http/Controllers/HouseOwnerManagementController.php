@@ -26,6 +26,7 @@ class HouseOwnerManagementController extends Controller
      */
     public function getHouseOwner(){
         try {
+            // dd(app()->getLocale());
             return view('house-owner.house-owner');
         } catch (Exception $e) {
             Log::error('getHouseOwner',[$e]);
@@ -38,7 +39,20 @@ class HouseOwnerManagementController extends Controller
      * @return false|string
      */
     public function houseOwnerList(Request $request){
-        $query = $this->houseOwner;
+        $query = $this->houseOwner
+                    ->when(getGuard() == 'admin', function ($q) {
+                        return $q;
+                    })->when(getGuard() == 'house-owner', function ($q) {
+                        return $q->where('id',auth()->guard('house-owner')->user()->id);
+                    })->when(getGuard() == 'tenant', function ($q) {
+                        return $q->with('properties')->whereHas('properties', function($query){
+                            return $query->where('id',auth()->guard('tenant')->user()->property_id);
+                        });
+                    })->when(getGuard() == 'web', function ($q) {
+                        return $q->with('properties.tenant')->whereHas('properties.tenant', function($query){
+                            $query->where('id',auth()->guard('web')->user()->tenant_id);
+                        });
+                    });
         $limit = $request->iDisplayLength;
         $offset = $request->iDisplayStart;
 
@@ -73,7 +87,7 @@ class HouseOwnerManagementController extends Controller
                             <div class="modal fade" id="propertyAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="propertyAdd-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.property.add').'">
+                                    <form class="container" method="post" action="'.route('property.add',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="propertyAdd-'.$value->id.'">Add property for <strong>'.$value->name.'</strong></h5>
@@ -112,7 +126,7 @@ class HouseOwnerManagementController extends Controller
                              <div class="modal fade" id="houseOwnerEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerEdit-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('house-owner.edit').'">
+                                    <form class="container" method="post" action="'.route('house-owner.edit',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="houseOwnerEdit-'.$value->id.'">Edit house owner</h5>
@@ -152,7 +166,7 @@ class HouseOwnerManagementController extends Controller
                              <div class="modal fade" id="houseOwnerDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="houseOwnerDelete-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('house-owner.delete').'">
+                                    <form class="container" method="post" action="'.route('house-owner.delete',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="houseOwnerDelete-'.$value->id.'">Delete House Owner</h5>

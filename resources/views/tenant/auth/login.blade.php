@@ -4,7 +4,7 @@
 @section('content')
     <div class="container pt-5 mt-5">
         <div class="card mx-auto col-3">
-            <form class="container" method="post" action="{{ route('tenant.post-login') }}">
+            <form class="container" method="post" action="{{ route('tenant.post-login',['locale' => app()->getLocale()]) }}">
                 @csrf
                 <div class="card-header text-center">
                     Login

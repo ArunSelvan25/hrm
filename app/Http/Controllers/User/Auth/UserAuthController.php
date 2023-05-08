@@ -25,7 +25,7 @@ class UserAuthController extends Controller
             'password' => $request['password']
         ];
         if($this->authAttempt($data,'web')) {
-            return redirect()->route('get-dashboard');
+            return redirect()->route('get-dashboard',['locale' => app()->getLocale()]);
         }
         return back()->with('errors','Credentials not matched');
     }
@@ -52,7 +52,7 @@ class UserAuthController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(){
-        Auth::logout();
-        return redirect()->route('web.get-login');
+        Auth::guard('web')->logout();
+        return redirect()->route('web.get-login',['locale' => app()->getLocale()]);
     }
 }

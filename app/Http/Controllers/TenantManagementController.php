@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\{TenantRegisterRequest, TenantEditRequest};
 use App\Models\{Tenant};
 use Illuminate\Support\Facades\{Hash, Crypt, Http};
+use Illuminate\Support\Facades\{Auth, Log};
+use Spatie\Permission\Models\Role;
 
 /**
  *
@@ -17,6 +19,10 @@ class TenantManagementController extends Controller
      */
     public function __construct(Tenant $tenant) {
         $this->tenant = $tenant;
+        // $this->middleware(['permission:tenant-create'])->only('addTenant');
+        $this->middleware(['permission:tenant-list'])->only('getTenant,tenantList');
+        $this->middleware(['permission:tenant-edit'])->only('editTenant');
+        $this->middleware(['permission:tenant-delete'])->only('deleteTenant');
     }
 
     /**
@@ -24,7 +30,7 @@ class TenantManagementController extends Controller
      */
     public function getTenant()
     {
-        return view('admin.tenant.tenant');
+        return view('tenant.tenant');
     }
 
     /**
@@ -41,8 +47,8 @@ class TenantManagementController extends Controller
             'profile' => 'need to add profile image',
             'password' => Hash::make($request['password']),
             'original_password' => Crypt::encryptString($request['password']),
-        ]);
-        return redirect()->route('admin.tenant')->with('success','Property Created successfully');
+        ])->assignRole('tenant');
+        return redirect()->route('tenant.tenant')->with('success','Property Created successfully');
     }
 
     /**
@@ -50,7 +56,18 @@ class TenantManagementController extends Controller
      * @return false|string
      */
     public function tenantList(Request $request){
-        $query = $this->tenant->with('property');
+        $query = $this->tenant->with('property')
+                    ->when(getGuard() == 'admin', function ($q) {
+                        return $q;
+                    })->when(getGuard() == 'house-owner', function ($q) {
+                        return $q->whereHas('property', function($query){
+                            return $query->where('house_owner_id',auth()->guard('house-owner')->user()->id);
+                        });
+                    })->when(getGuard() == 'tenant', function ($q) {
+                        return $q->where('id',auth()->guard('tenant')->user()->id);
+                    })->when(getGuard() == 'web', function ($q) {
+                        return $q->where('id',auth()->guard('web')->user()->tenant_id);
+                    });
         $limit = $request->iDisplayLength;
         $offset = $request->iDisplayStart;
 
@@ -74,27 +91,18 @@ class TenantManagementController extends Controller
         $data = $query->latest()->get();
         $column = array();
         foreach ($data as $value) {
-            $action = '<button class="btn btn-outline-success" href="#" data-toggle="modal"
+            $action = '';
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("user-create",getGuard())) {
+            $action .= '<button class="btn btn-outline-success" href="#" data-toggle="modal"
                                 data-target="#userAddModal-'.$value->id.'">
                             <i class="fas fa-duotone fa-users"></i>
                             Add User
                             </button>
-                             <button class="btn btn-outline-primary" href="#" data-toggle="modal"
-                                data-target="#tenantEditModal-'.$value->id.'">
-                                <i class="fas fa-solid fa-user-edit"></i>
-                                Edit
-                             </button>
-                              <button class="btn btn-outline-warning" href="#" data-toggle="modal"
-                                data-target="#tenantrDeleteModal-'.$value->id.'">
-                                <i class="fas fa-solid fa-trash"></i>
-                                Delete
-                             </button>
-
 
                              <div class="modal fade" id="userAddModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="userAdd-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.user.add').'">
+                                    <form class="container" method="post" action="'.route('user.add',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="userAdd-'.$value->id.'">Add User for <strong>'.$value->name.'</strong></h5>
@@ -133,14 +141,20 @@ class TenantManagementController extends Controller
                                         </div>
                                     </form>
                                 </div>
-                            </div>
+                            </div>';
+            }
 
 
-
-                             <div class="modal fade" id="tenantEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="tenantEdit-'.$value->id.'"
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("tenant-edit",getGuard())) {
+                    $action .= '<button class="btn btn-outline-primary" href="#" data-toggle="modal"
+                                    data-target="#tenantEditModal-'.$value->id.'">
+                                    <i class="fas fa-solid fa-user-edit"></i>
+                                    Edit
+                                </button>
+                                <div class="modal fade" id="tenantEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="tenantEdit-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.tenant.edit').'">
+                                    <form class="container" method="post" action="'.route('tenant.edit',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="tenantEdit-'.$value->id.'">Edit tenant</h5>
@@ -171,13 +185,19 @@ class TenantManagementController extends Controller
                                         </div>
                                     </form>
                                 </div>
-                            </div>
+                            </div>';
+            }
 
-
-                            <div class="modal fade" id="tenantrDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="tenantDelete-'.$value->id.'"
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("tenant-delete",getGuard())) {
+                        $action .= ' <button class="btn btn-outline-warning" href="#" data-toggle="modal"
+                                        data-target="#tenantrDeleteModal-'.$value->id.'">
+                                        <i class="fas fa-solid fa-trash"></i>
+                                        Delete
+                                    </button>
+                                    <div class="modal fade" id="tenantrDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="tenantDelete-'.$value->id.'"
                                  aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <form class="container" method="post" action="'.route('admin.tenant.delete').'">
+                                    <form class="container" method="post" action="'.route('tenant.delete',['locale' => app()->getLocale()]).'">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="tenantDelete-'.$value->id.'">Delete Tenant</h5>
@@ -198,12 +218,14 @@ class TenantManagementController extends Controller
                                     </form>
                                 </div>
                             </div>';
+            }
+
             $col['id'] = $offset+1;
             $col['property_name'] = $value->property->title ?? '-';
             $col['name'] = $value->name ?? '-';
             $col['email'] =$value->email ?? '-';
             $col['phone'] =$value->phone ?? '-';
-            $col['action']=$action ?? '-';
+            $col['action']= ($action != '') ? $action : '-';
 
             array_push($column, $col);
             $offset++;

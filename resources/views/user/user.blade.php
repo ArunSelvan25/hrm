@@ -1,4 +1,4 @@
-@extends('admin.layout.app')
+@extends('layout.app')
 @section('title') Tenant Management | {{ getGuard() }} @endsection('title')
 
 @section('page-styles')
@@ -12,13 +12,13 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <div class="row col-md-12">
-                @include('admin.user.user-add')
+                @include('user.user-add')
             </div>
         </div>
 
         <div class="card-body">
             <div class="table-responsive">
-                @include('admin.user.user-list')
+                @include('user.user-list')
             </div>
         </div>
     </div>
@@ -63,7 +63,7 @@
                 "bProcessing": true,
                 "bServerSide": true,
                 "destroy": true,
-                "sAjaxSource": "{{url('/')}}/admin/user/list",
+                "sAjaxSource": "{{url('/')}}/{{app()->getLocale()}}/user/list",
                 columns: [
                     { data: "id" },
                     { data: "property_name" },

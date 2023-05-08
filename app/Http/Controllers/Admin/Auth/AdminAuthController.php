@@ -29,7 +29,7 @@ class AdminAuthController extends Controller
             'password' => $request['password']
         ];
         if($this->authAttempt($data,'admin')) {
-            return redirect()->route('get-dashboard');
+            return redirect()->route('get-dashboard',['locale' => app()->getLocale()]);
         }
         return back()->with('errors','Credentials not matched');
     }
@@ -39,7 +39,7 @@ class AdminAuthController extends Controller
      */
     public function getdashboard()
     {
-        return view('admin.dashboard')->with('success','Login successfully');
+        return view('dashboard')->with('success','Login successfully');
     }
 
     /**
@@ -56,8 +56,8 @@ class AdminAuthController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(){
-        Auth::logout();
-        return redirect()->route('admin.get-login');
+        Auth::guard('admin')->logout();
+        return redirect()->route('admin.get-login',['locale' => app()->getLocale()]);
     }
 
     /**

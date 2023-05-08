@@ -6,6 +6,8 @@ use App\Http\Requests\{UserRegisterRequest, UserEditRequest};
 use Illuminate\Http\Request;
 use App\Models\{User};
 use Illuminate\Support\Facades\{Hash, Crypt, Http};
+use Illuminate\Support\Facades\{Auth, Log};
+use Spatie\Permission\Models\Role;
 
 /**
  *
@@ -17,6 +19,10 @@ class UserManagementController extends Controller
      */
     public function __construct(User $user) {
         $this->user = $user;
+        $this->middleware(['permission:user-create'])->only('addUser');
+        $this->middleware(['permission:user-list'])->only('getUser,userList');
+        $this->middleware(['permission:user-edit'])->only('editUser');
+        $this->middleware(['permission:user-delete'])->only('deleteUser');
     }
 
     /**
@@ -24,7 +30,7 @@ class UserManagementController extends Controller
      */
     public function getUser()
     {
-        return view('admin.user.user');
+        return view('user.user');
     }
 
     /**
@@ -41,8 +47,8 @@ class UserManagementController extends Controller
             'profile' => 'need to add profile image',
             'password' => Hash::make($request['password']),
             'original_password' => Crypt::encryptString($request['password']),
-        ]);
-        return redirect()->route('admin.user')->with('success','User Created successfully');
+        ])->assignRole('web');
+        return redirect()->route('user.user')->with('success','User Created successfully');
     }
 
     /**
@@ -50,7 +56,18 @@ class UserManagementController extends Controller
      * @return false|string
      */
     public function userList(Request $request){
-        $query = $this->user->with('tenant','tenant.property');
+        $query = $this->user->with('tenant','tenant.property')
+                    ->when(getGuard() == 'admin', function ($q) {
+                        return $q;
+                    })->when(getGuard() == 'house-owner', function ($q) {
+                        return $q->whereHas('tenant.property', function($query){
+                            return $query->where('house_owner_id',auth()->guard('house-owner')->user()->id);
+                        });
+                    })->when(getGuard() == 'tenant', function ($q) {
+                        return $q->where('tenant_id',auth()->guard('tenant')->user()->id);
+                    })->when(getGuard() == 'web', function ($q) {
+                        return $q->where('id',auth()->guard('web')->user()->id);
+                    });
         $limit = $request->iDisplayLength;
         $offset = $request->iDisplayStart;
 
@@ -75,23 +92,19 @@ class UserManagementController extends Controller
         $data = $query->latest()->get();
         $column = array();
         foreach ($data as $value) {
-//            dd($value->tenant->property->title,$value->tenant->name);
-
-            $action = '<button class="btn btn-outline-primary" href="#" data-toggle="modal"
+            $action = '';
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("user-edit",getGuard())) {
+                $action = '<button class="btn btn-outline-primary" href="#" data-toggle="modal"
                         data-target="#userEditModal-'.$value->id.'">
                         <i class="fas fa-solid fa-user-edit"></i>
                         Edit
                      </button>
-                      <button class="btn btn-outline-warning" href="#" data-toggle="modal"
-                        data-target="#userDeleteModal-'.$value->id.'">
-                        <i class="fas fa-solid fa-trash"></i>
-                        Delete
-                     </button>
+                      
 
                      <div class="modal fade" id="userEditModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="userEdit-'.$value->id.'"
                          aria-hidden="true">
                         <div class="modal-dialog" role="document">
-                            <form class="container" method="post" action="'.route('admin.user.edit').'">
+                            <form class="container" method="post" action="'.route('user.edit',['locale' => app()->getLocale()]).'">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="userEdit-'.$value->id.'">Edit User</h5>
@@ -122,13 +135,19 @@ class UserManagementController extends Controller
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div>';
+            }
 
-
-                    <div class="modal fade" id="userDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="userDelete-'.$value->id.'"
+            if(Auth::guard(getGuard())->user()->hasPermissionTo("user-delete",getGuard())) {
+                $action .= '<button class="btn btn-outline-warning" href="#" data-toggle="modal"
+                data-target="#userDeleteModal-'.$value->id.'">
+                <i class="fas fa-solid fa-trash"></i>
+                Delete
+             </button>
+             <div class="modal fade" id="userDeleteModal-'.$value->id.'" tabindex="-1" role="dialog" aria-labelledby="userDelete-'.$value->id.'"
                          aria-hidden="true">
                         <div class="modal-dialog" role="document">
-                            <form class="container" method="post" action="'.route('admin.user.delete').'">
+                            <form class="container" method="post" action="'.route('user.delete',['locale' => app()->getLocale()]).'">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="userDelete-'.$value->id.'">Delete User</h5>
@@ -149,13 +168,14 @@ class UserManagementController extends Controller
                             </form>
                         </div>
                     </div>';
+            }
             $col['id'] = $offset+1;
             $col['property_name'] = $value->tenant->property->title ?? '-';
             $col['tenant_name'] = $value->tenant->name ?? '-';
             $col['name'] = $value->name ?? '-';
             $col['email'] =$value->email ?? '-';
             $col['phone'] =$value->phone ?? '-';
-            $col['action']=$action ?? '-';
+            $col['action']=($action != '') ? $action : '-';
 
             array_push($column, $col);
             $offset++;

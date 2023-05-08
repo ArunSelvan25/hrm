@@ -3,7 +3,7 @@
 @section('content')
     <div class="container pt-5 mt-5">
         <div class="card mx-auto col-3">
-            <form class="container" method="post" action="{{ route('admin.post-login') }}">
+            <form class="container" method="post" action="{{ route('admin.post-login',['locale' => app()->getLocale()]) }}">
                 @csrf
                 <div class="card-header text-center">
                     Login Admin! We are waiting

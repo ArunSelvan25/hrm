@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Admin login
-Route::prefix('admin')
+Route::prefix('{locale}/admin')
     ->name('admin.')
     ->group(function () {
     Route::get('/login', [AdminAuthController::class,'getLogin'])->name('get-login');
@@ -32,21 +32,24 @@ Route::prefix('admin')
 
 // Roles and Permission
 Route::controller(RolesAndPermissionController::class)
-    ->middleware('auth:admin')
-    ->prefix('role-permission')
+    ->middleware('auth:admin','set_locale')
+    ->prefix('{locale}/role-permission')
     ->name('role-permission.')
+    ->where(['locale' => '[a-zA-Z]{2}']) // <-- Add a regex to validate the locale
     ->group(function () {
         Route::get('/', 'viewRolePermission')->name('view');
         Route::get('/list', 'listRolePermission')->name('list');
         Route::post('/sync-permission', 'syncPermissionWithRole')->name('sync-permission');
 });
 
-Route::get('/dashboard', [AdminAuthController::class,'getdashboard'])->name('get-dashboard');
+Route::get('{locale}/dashboard', [AdminAuthController::class,'getdashboard'])->name('get-dashboard')->middleware('set_locale');
 
 
 Route::controller(HouseOwnerManagementController::class)
-    ->middleware('auth:admin,house-owner,tenant,web')
-    ->group(function () {
+    ->middleware('auth:admin,house-owner,tenant,web,','set_locale')
+    ->prefix('{locale}') // <-- Add the locale segment to the URL
+    ->where(['locale' => '[a-zA-Z]{2}']) // <-- Add a regex to validate the locale
+        ->group(function () {
         // House owner management
         Route::controller(HouseOwnerManagementController::class)
             ->prefix('house-owner')
@@ -78,44 +81,53 @@ Route::controller(HouseOwnerManagementController::class)
                 Route::post('/delete', 'deleteProperty')->name('delete')
                     ->middleware('permission:property-delete');
             });
+
+        // Tenant management
+        Route::controller(TenantManagementController::class)
+        ->prefix('tenant')
+        ->name('tenant.')
+        ->group(function () {
+            Route::get('/', 'getTenant')->name('tenant')
+                ->middleware('permission:tenant-list');
+            Route::get('/list', 'tenantList')->name('list')
+                ->middleware('permission:tenant-list');
+            Route::post('/add', 'addTenant')->name('add')
+                ->middleware('permission:tenant-create');
+            Route::post('/edit', 'editTenant')->name('edit')
+                ->middleware('permission:tenant-edit');
+            Route::post('/delete', 'deleteTenant')->name('delete')
+                ->middleware('permission:tenant-delete');
+        });
+
+        // User management
+        Route::controller(UserManagementController::class)
+        ->prefix('user')
+        ->name('user.')
+        ->group(function () {
+            Route::get('/', 'getUser')->name('user')
+                ->middleware('permission:user-list');
+            Route::get('/list', 'userList')->name('list')
+                ->middleware('permission:user-list');
+            Route::post('/add', 'addUser')->name('add')
+                ->middleware('permission:user-create');
+            Route::post('/edit', 'editUser')->name('edit')
+                ->middleware('permission:user-edit');
+            Route::post('/delete', 'deleteUser')->name('delete')
+                ->middleware('permission:user-delete');
+        });
     });
 
-Route::prefix('admin')->middleware('auth:admin,house-owner,tenant,web')->name('admin.')->group(function () {
+Route::prefix('{locale}/admin')->middleware('auth:admin,house-owner,tenant,web')->name('admin.')->group(function () {
     Route::controller(AdminAuthController::class)->group(function () {
 
-//        Route::get('/dashboard', 'getdashboard')->name('get-dashboard');
         Route::get('/logout', 'logout')->name('logout');
 //    Route::get('/get-notification','getNotification')->name('get-notification');
         Route::get('/notification/delete', 'deleteNotification')->name('delete');
         Route::get('/notification/mark-as-read/{id}', 'markAsReadNotification')->name('mark-as-read');
     });
-
-    Route::controller(PropertyManagementController::class)->group(function () {
-        Route::get('/property', 'getProperty')->name('property');
-        Route::get('/property/list', 'propertyList')->name('property.list');
-        Route::post('/property/add', 'addProperty')->name('property.add');
-        Route::post('/property/edit', 'editProperty')->name('property.edit');
-        Route::post('/property/delete', 'deleteProperty')->name('property.delete');
-    });
-
-    Route::controller(TenantManagementController::class)->group(function () {
-        Route::get('/tenant', 'getTenant')->name('tenant');
-        Route::get('/tenant/list', 'tenantList')->name('tenant.list');
-        Route::post('/tenant/add', 'addTenant')->name('tenant.add');
-        Route::post('/tenant/edit', 'editTenant')->name('tenant.edit');
-        Route::post('/tenant/delete', 'deleteTenant')->name('tenant.delete');
-    });
-
-    Route::controller(UserManagementController::class)->group(function () {
-        Route::get('/user', 'getUser')->name('user');
-        Route::get('/user/list', 'userList')->name('user.list');
-        Route::post('/user/add', 'addUser')->name('user.add');
-        Route::post('/user/edit', 'editUser')->name('user.edit');
-        Route::post('/user/delete', 'deleteUser')->name('user.delete');
-    });
 });
 
-Route::controller(HouseOwnerAuthController::class)->prefix('house-owner')->name('house-owner.')->group(function () {
+Route::controller(HouseOwnerAuthController::class)->prefix('{locale}/house-owner')->name('house-owner.')->group(function () {
     Route::get('/register','getRegister')->name('get-register');
     Route::post('/register','postRegister')->name('post-register');
 
@@ -124,13 +136,13 @@ Route::controller(HouseOwnerAuthController::class)->prefix('house-owner')->name(
     Route::get('/logout', 'logout')->name('logout');
 });
 
-Route::controller(TenantAuthController::class)->prefix('tenant')->name('tenant.')->group(function () {
+Route::controller(TenantAuthController::class)->prefix('{locale}/tenant')->name('tenant.')->group(function () {
     Route::get('/login','getLogin')->name('get-login');
     Route::post('/login','postLogin')->name('post-login');
     Route::get('/logout', 'logout')->name('logout');
 });
 
-Route::controller(UserAuthController::class)->prefix('user')->name('web.')->group(function () {
+Route::controller(UserAuthController::class)->prefix('{locale}/user')->name('web.')->group(function () {
     Route::get('/login','getLogin')->name('get-login');
     Route::post('/login','postLogin')->name('post-login');
     Route::get('/logout', 'logout')->name('logout');

@@ -25,7 +25,7 @@ class TenantAuthController extends Controller
             'password' => $request['password']
         ];
         if($this->authAttempt($data,'tenant')) {
-            return redirect()->route('get-dashboard');
+            return redirect()->route('get-dashboard',['locale' => app()->getLocale()]);
         }
         return back()->with('errors','Credentials not matched');
     }
@@ -52,7 +52,7 @@ class TenantAuthController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(){
-        Auth::logout();
-        return redirect()->route('tenant.get-login');
+        Auth::guard('tenant')->logout();
+        return redirect()->route('tenant.get-login',['locale' => app()->getLocale()]);
     }
 }

@@ -1,28 +1,32 @@
 <div class="col-md-10">
-    <h4 class="m-0 font-weight-bold text-primary">Tenant List</h4>
+    <h4 class="m-0 font-weight-bold text-primary">User List</h4>
 </div>
-<div class="col-md-2">
-    <button class="btn btn-primary" href="#" data-toggle="modal" data-target="#tenantModal">
-        <i class="fas fa-solid fa-user-tie"></i>
-        Add Tenant
-    </button>
-</div>
+@if(Auth::guard(getGuard())->user()->hasPermissionTo("user-create",getGuard()))
+    <div class="col-md-2">
+        <button class="btn btn-primary" href="#" data-toggle="modal" data-target="#userModal">
+            <i class="fas fa-duotone fa-users"></i>
+            Add User
+        </button>
+    </div>
+@endif
 
 
 {{--    Property Add modal    --}}
-<div class="modal fade" id="tenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantAdd"
+<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userAdd"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <form class="container" method="post" action="{{route('admin.tenant.add')}}">
+        <form class="container" method="post" action="{{route('user.add')}}">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tenantAdd">Add tenant</h5>
+                    <h5 class="modal-title" id="userAdd">Add User</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" name="_token" value="'.csrf_token().'" readonly>
+                    <input type="hidden" name="tenant_id" value="'.$value->id.'" readonly>
                     <div class="mb-3">
                         <label for="name" class="form-label">Name</label>
                         <input type="text" name="name" class="form-control" id="name" placeholder="Name">
@@ -36,11 +40,11 @@
                         <input type="number" name="phone" class="form-control" id="phone" placeholder="1234567890">
                     </div>
                     <div class="mb-3" >
-                        <label for="description" class="form-label">Select Property</label>
-                        <select class="property-select form-label" style="width:100%" name="property_id" placeholder="Select property">
-                            <option selected="true" disabled>Select Property</option>
-                            @foreach(getPropertyList() as $propertyList)
-                                <option value="{{$propertyList->id}}">{{$propertyList->title}}</option>
+                        <label for="description" class="form-label">Select Tenant</label>
+                        <select class="tenant-select form-label" style="width:100%" name="tenant_id" placeholder="Select Tenant">
+                            <option selected="true" disabled>Select Tenant</option>
+                            @foreach(getTenantList() as $tenantList)
+                                <option value="{{$tenantList->id}}">{{$tenantList->title}}</option>
                             @endforeach
                         </select>
                     </div>

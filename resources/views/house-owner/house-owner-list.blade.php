@@ -1,18 +1,18 @@
 <table class="table table-bordered" id="owner-list-table">
     <thead>
     <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Name</th>
-        <th scope="col">Email</th>
-        <th scope="col">Action</th>
+        <th scope="col">{{ __('main_table.house_owner.id') }}</th>
+        <th scope="col">{{ __('main_table.house_owner.name') }}</th>
+        <th scope="col">{{ __('main_table.house_owner.email') }}</th>
+        <th scope="col">{{ __('main_table.house_owner.title') }}</th>
     </tr>
     </thead>
     <tfoot>
     <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Name</th>
-        <th scope="col">Email</th>
-        <th scope="col">Action</th>
+        <th scope="col">{{ __('main_table.house_owner.id') }}</th>
+        <th scope="col">{{ __('main_table.house_owner.name') }}</th>
+        <th scope="col">{{ __('main_table.house_owner.email') }}</th>
+        <th scope="col">{{ __('main_table.house_owner.action') }}</th>
     </tr>
     </tfoot>
     <tbody id="owner-list">
