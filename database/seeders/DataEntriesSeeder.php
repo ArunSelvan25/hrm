@@ -21,7 +21,7 @@ class DataEntriesSeeder extends Seeder
 
 
         // Create house owners
-        for($i=1; $i <= 100; $i++){
+        for($i=1; $i <= 5; $i++){
             HouseOwner::create([
                 'name' => 'Owner '.$faker->name(),
                 'email' => 'owner'.Str::random(8).'@mailinator.com',
